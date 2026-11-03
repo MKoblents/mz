@@ -77,7 +77,7 @@ var: forth | stack | neum | mc | stream | mem | pstr | cache | alg1
 | push imm | literal | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S<br>LITERAL -> T  | dup + last action    |
 | dup      | dup     | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S                  |                      |
 | drop     | drop    | S -> T,<br>SP+4 -> SP,<br>MEM[SP] -> S                   |                      |
-| swap     | swap    | T-S, S->T                                                |                      |
+| swap     | swap    | T->S, S->T                                               |                      |
 | over     | over    | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>MEM[SP+4]->T | dup + last action    |
 | pop      |         |                                                          | непоятно куда попать |
 ## Return Stack
@@ -115,10 +115,62 @@ var: forth | stack | neum | mc | stream | mem | pstr | cache | alg1
 | command | word | what                       | notices |
 | ------- | ---- | -------------------------- | ------- |
 | load    | @    | MEM[T]->T                  |         |
-| store   | !    | MEM[S] <- T,<br>drop, drop |         |
+| store   | !    | MEM[T] <- S,<br>drop, drop |         |
 
 
 # Control Unit
+
+# Data Path
+Signals:
+latch_registr: alu -> r
+- latch_s
+- latch_pc
+- latch_sp
+- latch_rsp
+- latch_dr_alu
+- latch_dr_mem
+- latch_r
+- latch_t
+- latch_ar
+- latch_ir
+mux dr:
+- sel_alu
+- sel_mem
+mux A (aluA_sel):
+- selA_ir
+- selA_s
+- selA_pc
+- selA_sp
+- selA_rsp
+- selA_dr
+mux B (aluB_sel):
+- selB_dr
+- selB_r
+- selB_t
+- const_sel (к этому сигналу уже выбрана константа, там скрыт мукс на константы)
+- selB_ar
+alu_op:
+- plus
+- minus
+- mul
+- div
+- mod
+- and
+- or
+- xor
+- passA
+- passB
+sr:
+- latch_n
+- latch_z
+- latch_v
+- latch_c
+mem:
+- mem_rd
+- mem_wr
+
+- halt
+
 
 # Tests
 
