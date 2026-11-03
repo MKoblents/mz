@@ -72,50 +72,57 @@ var: forth | stack | neum | mc | stream | mem | pstr | cache | alg1
 
 ## Data Stack
 
-| command  | word    | what                                                     | notices              |
-| -------- | ------- | -------------------------------------------------------- | -------------------- |
-| push imm | literal | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S<br>LITERAL -> T  | dup + last action    |
-| dup      | dup     | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S                  |                      |
-| drop     | drop    | S -> T,<br>SP+4 -> SP,<br>MEM[SP] -> S                   |                      |
-| swap     | swap    | T->S, S->T                                               |                      |
-| over     | over    | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>MEM[SP+4]->T | dup + last action    |
-| pop      |         |                                                          | непоятно куда попать |
+| command  | word    | opcode   | what                                                     | notices           |
+| -------- | ------- | -------- | -------------------------------------------------------- | ----------------- |
+| push imm | literal | ffxxxxxx | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S<br>LITERAL -> T  | dup + last action |
+| dup      | dup     | 01000000 | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S                  |                   |
+| drop     | drop    | 02000000 | S -> T,<br>SP+4 -> SP,<br>MEM[SP] -> S                   |                   |
+| swap     | swap    | 03000000 | T->S, S->T                                               |                   |
+| over     | over    | 04000000 | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>MEM[SP+4]->T | dup + last action |
+
 ## Return Stack
-| command | word | what                                                   | notices |
-| ------- | ---- | ------------------------------------------------------ | ------- |
-| call X  | @X   | MEM[RSP]<- R,<br>RSP - 4 -> RSP<br>PC -> R,<br>X -> PC |         |
-| ret     | ;    | PC <- R,<br>RSP + 4 -> RSP<br>MEM[RSP]->  R,<br>       |         |
-| tor     | >r   |                                                        |         |
-| rot     | r>   |                                                        |         |
+| command | word | opcode   | what                                                   | notices |
+| ------- | ---- | -------- | ------------------------------------------------------ | ------- |
+| call X  | X    | 10xxxxxx | MEM[RSP]<- R,<br>RSP - 4 -> RSP<br>PC -> R,<br>X -> PC |         |
+| ret     | ;    | 05000000 | PC <- R,<br>RSP + 4 -> RSP<br>MEM[RSP]->  R,<br>       |         |
+| tor     | >r   | 06000000 |                                                        |         |
+| rot     | r>   | 07000000 |                                                        |         |
 
 
 ## Arithmetic
-| command | word | what                                                            | notices           |
-| ------- | ---- | --------------------------------------------------------------- | ----------------- |
-| add     | +    | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>S + MEM[SP+4] -> t  | dup + last action |
-| sub     | -    | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>MEM[SP+4] - S -> t  | dup + last action |
-| mul     | *    | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>S * MEM[SP+4] -> t  | dup + last action |
-| div     | /    | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>MEM[SP+4] / S -> tt | dup + last action |
-| mod     | %    | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>MEM[SP+4] % S -> tt | dup + last action |
+| command | word |      | what                                                            | notices           |
+| ------- | ---- | ---- | --------------------------------------------------------------- | ----------------- |
+| add     | +    | 11000000 | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>S + MEM[SP+4] -> t  | dup + last action |
+| sub     | -    | 12000000 | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>MEM[SP+4] - S -> t  | dup + last action |
+| mul     | *    | 13000000 | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>S * MEM[SP+4] -> t  | dup + last action |
+| div     | /    | 14000000 | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>MEM[SP+4] / S -> tt | dup + last action |
+| mod     | %    | 15000000 | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>MEM[SP+4] % S -> tt | dup + last action |
 ## logic
-| command | word | what                                                             | notices           |
-| ------- | ---- | ---------------------------------------------------------------- | ----------------- |
-| and     | and  | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>S & MEM[SP+4] -> t   | dup + last action |
-| or      | or   | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>MEM[SP+4] \| S -> t  | dup + last action |
-| xor     | xor  | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>S xor MEM[SP+4] -> t | dup + last action |
+| command | word |      | what                                                             | notices           |
+| ------- | ---- | ---- | ---------------------------------------------------------------- | ----------------- |
+| and     | and  | 16000000 | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>S & MEM[SP+4] -> t   | dup + last action |
+| or      | or   | 17000000 | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>MEM[SP+4] \| S -> t  | dup + last action |
+| xor     | xor  | 18000000 | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>S xor MEM[SP+4] -> t | dup + last action |
 ## Srav
 
-| command | word | what                                                                         | notices           |
-| ------- | ---- | ---------------------------------------------------------------------------- | ----------------- |
-| eq      | =    | if (S = T): fl = -1 else fl = 0<br>MEM[SP+4]->S,<br>SP +4 -> SP,<br>fl -> T  | dup + last action |
-| lt      | <    | if (S < T): fl = -1 else fl = 0<br>MEM[SP+4]->S,<br>SP +4 -> SP,<br>fl -> T  |                   |
-| gt      | >    | if (S > T): fl = -1 else fl = 0<br>MEM[SP+4]->S,<br>SP +4 -> SP,<br>fl -> T  |                   |
-| ult     | u<   | if (S u< T): fl = -1 else fl = 0<br>MEM[SP+4]->S,<br>SP +4 -> SP,<br>fl -> T |                   |
+| command | word |      | what                                                                         | notices           |
+| ------- | ---- | ---- | ---------------------------------------------------------------------------- | ----------------- |
+| eq      | =    | 19000000 | if (S = T): fl = -1 else fl = 0<br>MEM[SP+4]->S,<br>SP +4 -> SP,<br>fl -> T  | dup + last action |
+| lt      | <    | 1A000000 | if (S < T): fl = -1 else fl = 0<br>MEM[SP+4]->S,<br>SP +4 -> SP,<br>fl -> T  |                   |
+| gt      | >    | 1B000000 | if (S > T): fl = -1 else fl = 0<br>MEM[SP+4]->S,<br>SP +4 -> SP,<br>fl -> T  |                   |
+| ult     | u<   | 1C000000 | if (S u< T): fl = -1 else fl = 0<br>MEM[SP+4]->S,<br>SP +4 -> SP,<br>fl -> T |                   |
+## Branch
+| command  | word      |      | what                     | notices |
+| -------- | --------- | ---- | ------------------------ | ------- |
+| if       | if label  | 30xxxxxx | if (T=0) then label->PC  |         |
+| jump     | jmp label | 31xxxxxx | label ->pc               |         |
+| minus if | -if label | 32xxxxxx | if (T!=0) then label->PC |         |
+
 ## Memory (T=address)
-| command | word | what                       | notices |
-| ------- | ---- | -------------------------- | ------- |
-| load    | @    | MEM[T]->T                  |         |
-| store   | !    | MEM[T] <- S,<br>drop, drop |         |
+| command | word |      | what                       | notices |
+| ------- | ---- | ---- | -------------------------- | ------- |
+| load    | @    | 20000000 | MEM[T]->T                  |         |
+| store   | !    | 21000000 | MEM[T] <- S,<br>drop, drop |         |
 
 
 # Control Unit
@@ -133,6 +140,7 @@ latch_registr: alu -> r
 - latch_t
 - latch_ar
 - latch_ir
+- latch_sr
 mux dr:
 - sel_alu
 - sel_mem
@@ -158,18 +166,25 @@ alu_op:
 - and
 - or
 - xor
+- shl
+- shr
 - passA
 - passB
-sr:
-- latch_n
-- latch_z
-- latch_v
-- latch_c
 mem:
 - mem_rd
 - mem_wr
 
 - halt
+
+## Microcode format
+1 -- enabled
+0 -- disabled
+
+
+
+| 0...10                                                                                                                                                     | 11                                   | 12...14  | 15...17  | 18...19   | 20...23 | 24...25           | 26   | 27...30? | 30?...38? |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ | -------- | -------- | --------- | ------- | ----------------- | ---- | -------- | --------- |
+| latch_s<br>, latch_pc<br>, latch_sp<br>, latch_rsp<br>, latch_dr_alu<br>, latch_dr_mem<br>, latch_r<br>, latch_t<br>, latch_ar<br>, latch_ir<br>, latch_sr | mux dr<br>1 - sel_alu<br>0 - sel_mem | muxA_sel | muxB_sel | const_sel | alu_op  | mem_rd,<br>mem_wr | halt | cond     | addr      |
 
 
 # Tests
