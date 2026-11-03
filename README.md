@@ -67,7 +67,56 @@ var: forth | stack | neum | mc | stream | mem | pstr | cache | alg1
 
 # Memory
 
+
 # ISA
+
+## Data Stack
+
+| command  | word    | what                                                     | notices              |
+| -------- | ------- | -------------------------------------------------------- | -------------------- |
+| push imm | literal | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S<br>LITERAL -> T  | dup + last action    |
+| dup      | dup     | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S                  |                      |
+| drop     | drop    | S -> T,<br>SP+4 -> SP,<br>MEM[SP] -> S                   |                      |
+| swap     | swap    | T-S, S->T                                                |                      |
+| over     | over    | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>MEM[SP+4]->T | dup + last action    |
+| pop      |         |                                                          | непоятно куда попать |
+## Return Stack
+| command | word | what                                                   | notices |
+| ------- | ---- | ------------------------------------------------------ | ------- |
+| call X  | @X   | MEM[RSP]<- R,<br>RSP - 4 -> RSP<br>PC -> R,<br>X -> PC |         |
+| ret     | ;    | PC <- R,<br>RSP + 4 -> RSP<br>MEM[RSP]->  R,<br>       |         |
+| tor     | >r   |                                                        |         |
+| rot     | r>   |                                                        |         |
+
+
+## Arithmetic
+| command | word | what                                                            | notices           |
+| ------- | ---- | --------------------------------------------------------------- | ----------------- |
+| add     | +    | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>S + MEM[SP+4] -> t  | dup + last action |
+| sub     | -    | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>MEM[SP+4] - S -> t  | dup + last action |
+| mul     | *    | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>S * MEM[SP+4] -> t  | dup + last action |
+| div     | /    | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>MEM[SP+4] / S -> tt | dup + last action |
+| mod     | %    | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>MEM[SP+4] % S -> tt | dup + last action |
+## logic
+| command | word | what                                                             | notices           |
+| ------- | ---- | ---------------------------------------------------------------- | ----------------- |
+| and     | and  | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>S & MEM[SP+4] -> t   | dup + last action |
+| or      | or   | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>MEM[SP+4] \| S -> t  | dup + last action |
+| xor     | xor  | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>S xor MEM[SP+4] -> t | dup + last action |
+## Srav
+
+| command | word | what                                                                         | notices           |
+| ------- | ---- | ---------------------------------------------------------------------------- | ----------------- |
+| eq      | =    | if (S = T): fl = -1 else fl = 0<br>MEM[SP+4]->S,<br>SP +4 -> SP,<br>fl -> T  | dup + last action |
+| lt      | <    | if (S < T): fl = -1 else fl = 0<br>MEM[SP+4]->S,<br>SP +4 -> SP,<br>fl -> T  |                   |
+| gt      | >    | if (S > T): fl = -1 else fl = 0<br>MEM[SP+4]->S,<br>SP +4 -> SP,<br>fl -> T  |                   |
+| ult     | u<   | if (S u< T): fl = -1 else fl = 0<br>MEM[SP+4]->S,<br>SP +4 -> SP,<br>fl -> T |                   |
+## Memory (T=address)
+| command | word | what                       | notices |
+| ------- | ---- | -------------------------- | ------- |
+| load    | @    | MEM[T]->T                  |         |
+| store   | !    | MEM[S] <- T,<br>drop, drop |         |
+
 
 # Control Unit
 
