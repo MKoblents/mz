@@ -180,11 +180,26 @@ mem:
 1 -- enabled
 0 -- disabled
 
+| 0...10                                                                                                                | 11...13  | 14...16  | 17...18   | 19...22 | 23...24           | 25   | 26...29 | 29...37 |
+| --------------------------------------------------------------------------------------------------------------------- | -------- | -------- | --------- | ------- | ----------------- | ---- | ------- | ------- |
+| latch_s, latch_pc, latch_sp, latch_rsp, latch_dr_alu, latch_dr_mem, latch_r,<br>latch_t, latch_ar, latch_ir, latch_sr | muxA_sel | muxB_sel | const_sel | alu_op  | mem_rd,<br>mem_wr | halt | cond    | addr    |
 
+### Conditions codes
 
-| 0...10                                                                                                                                                     | 11                                   | 12...14  | 15...17  | 18...19   | 20...23 | 24...25           | 26   | 27...30? | 30?...38? |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ | -------- | -------- | --------- | ------- | ----------------- | ---- | -------- | --------- |
-| latch_s<br>, latch_pc<br>, latch_sp<br>, latch_rsp<br>, latch_dr_alu<br>, latch_dr_mem<br>, latch_r<br>, latch_t<br>, latch_ar<br>, latch_ir<br>, latch_sr | mux dr<br>1 - sel_alu<br>0 - sel_mem | muxA_sel | muxB_sel | const_sel | alu_op  | mem_rd,<br>mem_wr | halt | cond     | addr      |
+| code | name     | jmp to addr if                           |
+| ---- | -------- | ---------------------------------------- |
+| 0    | next     | addr = mPC+1                             |
+| 1    | jmp      | addr = addr                              |
+| 2    | jz       | Z == 0                                   |
+| 3    | jnz      | Z != 0                                   |
+| 4    | JVS      | V == 1                                   |
+| 5    | JVC      | V == 0                                   |
+| 6    | JCS      | C == 1                                   |
+| 7    | JCC      | C == 0                                   |
+| 8    | JN       | N == 1                                   |
+| 9    | JP       | N == 0                                   |
+| 10   | JLV      | N != V                                   |
+| 11   | DISPATCH | на начало микропрограммы по опкоду из IR |
 
 
 # Tests
