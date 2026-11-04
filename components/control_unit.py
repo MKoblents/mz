@@ -6,6 +6,7 @@ class ControlUnit:
         self.instruction_set = parse_instruction(self.instruction_register)
         self.halt = False
         self.instruction_decoder = 0
+        self.ready = True
 
     def select_pc(self, signal):
         signal = int(signal, 2)
@@ -38,3 +39,26 @@ class ControlUnit:
             "cond": instruction[26:30],
             "addr": instruction[30:38]
         }
+
+    def chose_next_pc(self, cond):
+        cond = int(cond, 2)
+        if cond == 11:
+            return 2
+        #TODO conditional jumps
+        else:
+            return 0
+        
+
+    def start(self):
+        data_path = DataPath()
+        memory = Memory(data_path)
+        while not self.halt:
+            if (not self.ready):
+                continue
+            self.instruction_register = self.memory[self.programm_counter]
+            self.instruction_set = self.parse_instruction(self.instruction_register)
+            data_path.deal(self.instruction_set)
+            memory.deal(self.instruction_set)
+            self.programm_counter = self.select_pc(self.chose_next_pc(self.instruction_set.get("cond")))
+            
+            
