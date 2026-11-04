@@ -90,19 +90,19 @@ var: forth | stack | neum | mc | stream | mem | pstr | cache | alg1
 
 
 ## Arithmetic
-| command | word |      | what                                                            | notices           |
-| ------- | ---- | ---- | --------------------------------------------------------------- | ----------------- |
-| add     | +    | 11000000 | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>S + MEM[SP+4] -> t  | dup + last action |
-| sub     | -    | 12000000 | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>MEM[SP+4] - S -> t  | dup + last action |
-| mul     | *    | 13000000 | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>S * MEM[SP+4] -> t  | dup + last action |
-| div     | /    | 14000000 | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>MEM[SP+4] / S -> tt | dup + last action |
-| mod     | %    | 15000000 | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>MEM[SP+4] % S -> tt | dup + last action |
+| command | word |          | what                                  | notices           |
+| ------- | ---- | -------- | ------------------------------------- | ----------------- |
+| add     | +    | 11000000 | S+T->T<br>SP+4 -> SP,<br>MEM[SP] -> S | dup + last action |
+| sub     | -    | 12000000 | S-T->T<br>SP+4 -> SP,<br>MEM[SP] -> S | dup + last action |
+| mul     | *    | 13000000 | S*T>T<br>SP+4 -> SP,<br>MEM[SP] -> S  | dup + last action |
+| div     | /    | 14000000 | S/T->T<br>SP+4 -> SP,<br>MEM[SP] -> S | dup + last action |
+| mod     | %    | 15000000 | S%T->T<br>SP+4 -> SP,<br>MEM[SP] -> S | dup + last action |
 ## logic
-| command | word |      | what                                                             | notices           |
-| ------- | ---- | ---- | ---------------------------------------------------------------- | ----------------- |
-| and     | and  | 16000000 | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>S & MEM[SP+4] -> t   | dup + last action |
-| or      | or   | 17000000 | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>MEM[SP+4] \| S -> t  | dup + last action |
-| xor     | xor  | 18000000 | S -> MEM[SP], <br>SP-4 -> SP,<br>T -> S,<br>S xor MEM[SP+4] -> t | dup + last action |
+| command | word |          | what                                       | notices           |
+| ------- | ---- | -------- | ------------------------------------------ | ----------------- |
+| and     | and  | 16000000 | S & T->T<br>SP+4 -> SP,<br>MEM[SP] -> S    | dup + last action |
+| or      | or   | 17000000 | S \| T->T<br>SP+4 -> SP,<br>MEM[SP] -> S   | dup + last action |
+| xor     | xor  | 18000000 | S xor T->T<br>SP+4 -> SP,<br>MEM[SP] -> St | dup + last action |
 ## Srav
 
 | command | word |      | what                                                                         | notices           |
@@ -180,9 +180,9 @@ mem:
 1 -- enabled
 0 -- disabled
 
-| 0...10                                                                                                                | 11...13                                                                 | 14...16                                                     | 17...18                                     | 19...22                                                                                                                                                                                      | 23...24           | 25   | 26...29 | 30...37 |
-| --------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- | ----------------------------------------------------------- | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- | ---- | ------- | ------- |
-| latch_s, latch_pc, latch_sp, latch_rsp, latch_dr_alu, latch_dr_mem, latch_r,<br>latch_t, latch_ar, latch_ir, latch_sr | muxA_sel<br>0-imm<br>1-s<br>2-10-pc<br>3-11-sp<br>4-100-rsp<br>5-101-dr | muxB_sel<br>0-dr<br>1-r<br>2-10-t<br>3-11-const<br>4-100-ar | const_sel<br>0-0<br>1-1<br>2-10-4<br>3-11-8 | alu_op<br>0-A+B<br>1- A-B<br>2-10- A*B<br>3-11- A/B<br>4-100-A%B<br>5-101 A a1nd B<br>6-110- A or B<br>7-111-A xor B<br>8-1000- pass A<br>9-1001-pass B<br>10 - 1010- shl<br>11 - 1011 - shr | mem_rd,<br>mem_wr | halt | cond    | addr    |
+| 0...10                                                                                                                | 11...13                                                                 | 14...16                                                     | 17...18                                     | 19...22                                                                                                                                                                                     | 23...24           | 25   | 26...29 | 30...37 |
+| --------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- | ----------------------------------------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- | ---- | ------- | ------- |
+| latch_s, latch_pc, latch_sp, latch_rsp, latch_dr_alu, latch_dr_mem, latch_r,<br>latch_t, latch_ar, latch_ir, latch_sr | muxA_sel<br>0-imm<br>1-s<br>2-10-pc<br>3-11-sp<br>4-100-rsp<br>5-101-dr | muxB_sel<br>0-dr<br>1-r<br>2-10-t<br>3-11-const<br>4-100-ar | const_sel<br>0-0<br>1-1<br>2-10-4<br>3-11-8 | alu_op<br>0-A+B<br>1- A-B<br>2-10- A*B<br>3-11- A/B<br>4-100-A%B<br>5-101 A and B<br>6-110- A or B<br>7-111-A xor B<br>8-1000- pass A<br>9-1001-pass B<br>10 - 1010- shl<br>11 - 1011 - shr | mem_rd,<br>mem_wr | halt | cond    | addr    |
 
 ### Conditions codes
 
