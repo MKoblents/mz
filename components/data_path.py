@@ -51,28 +51,54 @@ class DataPath:
         elif signal == 3:
             return 8
         
-    def select_alu(self, signal):
+    def select_alu(self, signal, A, B):
         signal = int(signal, 2)
         if signal == 0:
-            return self.select_a(signal) + self.select_b(signal)
+            return A + B
         elif signal == 1:
-            return self.select_a(signal) - self.select_b(signal)
+            return A - B
         elif signal == 2:
-            return self.select_a(signal) * self.select_b(signal)
+            return A * B
         elif signal == 3:
-            return self.select_a(signal) // self.select_b(signal)
+            return A // B
         elif signal == 4:
-            return self.select_a(signal) % self.select_b(signal)
+            return A % B
         elif signal == 5:
-            return self.select_a(signal) & self.select_b(signal)
+            return A & B
         elif signal == 6:
-            return self.select_a(signal) | self.select_b(signal)
+            return A | B
         elif signal == 7:
-            return self.select_a(signal) ^ self.select_b(signal)
+            return A ^ B
         elif signal == 8:
-            return self.select_a(signal)
+            return A
         elif signal == 9:
-            return self.select_b(signal)
+            return B
         #TODO shifts
+        #TODO flags
+    
+    def deal(self, instruction_set):
+        res = self.select_alu(instruction_set.get("alu_sel"), self.select_a(instruction_set.get("mux_a_sel")), self.select_b(instruction_set.get("mux_b_sel")))
+        if instruction_set.get("latch_s"):
+            self.second = res
+        if instruction_set.get("latch_pc"):
+            self.programm_counter = res
+        if instruction_set.get("latch_sp"):
+            self.stack_pointer = res
+        if instruction_set.get("latch_rsp"):
+            self.return_stack_pointer = res
+        if instruction_set.get("latch_dr_alu"):
+            self.data_registr = res
+        # if instruction_set.get("latch_dr_mem"):
+            # self.data_registr = res
+        if instruction_set.get("latch_r"):
+            self.return_registr = res
+        if instruction_set.get("latch_t"):
+            self.top = res
+        if instruction_set.get("latch_ar"):
+            self.adress_registr = res
+        if instruction_set.get("latch_ir"):
+            self.instruction_register = res
+        if instruction_set.get("latch_sr"):
+            self.status_register = res
 
     
