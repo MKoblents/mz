@@ -1,0 +1,22 @@
+class Microinstruction:
+    latch_s: bool
+    latch_pc: bool
+    latch_sp: bool
+    latch_rsp: bool
+    latch_dr_alu: bool
+    latch_dr_mem: bool
+    latch_r: bool
+    latch_t: bool
+    latch_ar: bool
+    latch_ir: bool
+    latch_sr: bool
+    mux_a_sel: int
+    mux_b_sel: int
+    const_sel: int
+    alu_op: int
+    mem_rd: bool
+    mem_wr: bool
+    halt: bool
+    cond: int
+    addr: int
+    label: str = ""
