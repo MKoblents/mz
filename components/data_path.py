@@ -151,7 +151,7 @@ class DataPath:
         b = self.select_b(micro.mux_b_sel, micro.const_sel)
         return self.select_alu(micro.alu_op, a, b)
 
-    def step(self, micro: Microinstruction, memory_data: int | None) -> None:
+    def tick(self, micro: Microinstruction, memory_data: int | None) -> None:
         result, flags = self.compute(micro)
         if micro.latch_s:
             self.second = result
