@@ -1,6 +1,19 @@
 from typeguard import value
 
-from microcode import Microinstruction
+from microcode.microcode import Microinstruction
+
+from isa import (
+    DATA_STACK_INIT,
+    OPCODE_SHIFT,
+    OPERAND_BITS,
+    RETURN_STACK_INIT,
+    SIGN_BIT,
+    WORD_MASK,
+    sign_extend,
+    to_signed,
+    to_unsigned,
+)
+
 
 class Flags:
     n: bool = False
@@ -41,7 +54,7 @@ class DataPath:
     def select_a(self, signal):
         signal = int(signal, 2)
         if signal == 0:
-            return self.sign_extend(self.instruction_register)
+            return to_signed(self.instruction_register)
         elif signal == 1:
             return self.second
         elif signal == 2:
@@ -55,12 +68,8 @@ class DataPath:
         raise ValueError(f"bad mux_a_sel {signal}")
 
 
-    def sign_extend(self, value:bytes):
-        x=value[24]
-        return x*8+value[24:] #TODO
-
     def divide(self, op: int, a: int, b: int) -> int:
-        dividend, divisor = self.sign_extend(a), self.sign_extend(b)
+        dividend, divisor = to_signed(a), to_signed(b)
         if divisor == 0:
             raise ZeroDivisionError("division by zero")
         quotient = abs(dividend) // abs(divisor)
@@ -72,7 +81,6 @@ class DataPath:
 
 
     def select_b(self, signal:int, const_signal:int = None) -> int:
-        signal = int(signal, 2)
         if signal == 0:
             return self.data_register
         elif signal == 1:
@@ -92,67 +100,48 @@ class DataPath:
             raise ValueError(f"bad const_sel {signal}")
         return constants[signal]
         
-    def select_alu(self, signal, A, B):
-        signal = int(signal, 2)
+    def select_alu(self, signal: int, A: int, B: int) -> tuple[int, Flags]:
+        carry = False
+        overflow = False
         if signal == ALU_PLUS:
-            return A + B
+            full = A + B
+            result = full & WORD_MASK
+            carry = full > WORD_MASK
+            overflow = bool((A ^ result) & (B ^ result) & SIGN_BIT)
         elif signal == ALU_MINUS:
-            return A - B
+            result = (A - B) & WORD_MASK
+            carry = A < B
+            overflow = bool((A ^ B) & (A ^ result) & SIGN_BIT)
         elif signal == ALU_MUL:
-            return A * B
+            result = to_unsigned(to_signed(A) * to_signed(B))
         elif signal in (ALU_DIV, ALU_MOD):
             result = self.divide(signal, A, B)
         elif signal == ALU_AND:
-            return A & B
+            result = A & B
         elif signal == ALU_OR:
-            return A | B
+            result = A | B
         elif signal == ALU_XOR:
-            return A ^ B
+            result = A ^ B
         elif signal == ALU_PASS_A:
-            return A
+            result = A
         elif signal == ALU_PASS_B:
-            return B
+            result = B
         elif signal == ALU_SHL:
-            result = A << (B & 31)
+            result = to_unsigned(A << (B & 31))
         elif signal == ALU_SHR:
             result = A >> (B & 31)
         else:
             raise ValueError(f"bad alu_op {signal}")
-        return result
-
-    def deal(self, instruction_set):
-        self.const = self.select_constant(instruction_set.get("const_sel"))
-        res = self.select_alu(instruction_set.get("alu_sel"), self.select_a(instruction_set.get("mux_a_sel")), self.select_b(instruction_set.get("mux_b_sel")))
-        if instruction_set.get("latch_s"):
-            self.second = res
-        if instruction_set.get("latch_pc"):
-            self.program_counter = res
-        if instruction_set.get("latch_sp"):
-            self.stack_pointer = res
-        if instruction_set.get("latch_rsp"):
-            self.return_stack_pointer = res
-        if instruction_set.get("latch_dr_alu"):
-            self.data_register = res
-        # if instruction_set.get("latch_dr_mem"):
-            # self.data_register = res
-        if instruction_set.get("latch_r"):
-            self.return_register = res
-        if instruction_set.get("latch_t"):
-            self.top = res
-        if instruction_set.get("latch_ar"):
-            self.address_register = res
-        if instruction_set.get("latch_ir"):
-            self.instruction_register = res
-        if instruction_set.get("latch_sr"):
-            self.status_register = res
+        flags = Flags(n=bool(result & SIGN_BIT), z=result == 0, v=overflow, c=carry)
+        return result, flags
 
     def snapshot(self) -> str:
         flags = self.status_register
         return (
             f"PC:{self.program_counter:#06x} SP:{self.stack_pointer:#06x} "
-            f"RSP:{self.return_stack_pointer:#06x} T:{self.sign_extend(self.top)} "
-            f"S:{self.sign_extend(self.second)} R:{self.return_register:#x} "
-            f"AR:{self.address_register:#06x} DR:{self.sign_extend(self.data_register)} "
+            f"RSP:{self.return_stack_pointer:#06x} T:{to_signed(self.top)} "
+            f"S:{to_signed(self.second)} R:{self.return_register:#x} "
+            f"AR:{self.address_register:#06x} DR:{to_signed(self.data_register)} "
             f"IR:{self.instruction_register:#010x} "
             f"NZVC:{int(flags.n)}{int(flags.z)}{int(flags.v)}{int(flags.c)}"
         )
