@@ -83,7 +83,7 @@ class ControlUnit:
         if micro.halt:
             self.halted = True
             return
-        next_mpc = self.next_mpc(micro)
+        next_mpc = self.get_next_mpc(micro)
         self.data_path.tick(micro, data if micro.mem_rd else None)
         self.mpc = next_mpc
         self.mir = self.rom[next_mpc]

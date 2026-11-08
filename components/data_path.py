@@ -1,5 +1,3 @@
-from typeguard import value
-
 from microcode.microcode import Microinstruction
 
 from isa import (
@@ -38,23 +36,21 @@ class DataPath:
     def __init__(self)->None:
         self.second=0
         self.program_counter=0
-        self.stack_pointer=4096 #TODO ?
-        self.return_stack_pointer=5000 #TODO ?
+        self.stack_pointer=DATA_STACK_INIT
+        self.return_stack_pointer=RETURN_STACK_INIT
         self.data_register=0
         self.return_register=0
         self.top=0
         self.address_register=0
         self.instruction_register=0
-        self.const=0
         self.status_register=Flags()
 
     def opcode(self) -> int:
-        return self.instruction_register >> 8
+        return self.instruction_register >> OPCODE_SHIFT
     
     def select_a(self, signal):
-        signal = int(signal, 2)
         if signal == 0:
-            return to_signed(self.instruction_register)
+            return sign_extend(self.instruction_register, OPERAND_BITS)
         elif signal == 1:
             return self.second
         elif signal == 2:
@@ -91,7 +87,7 @@ class DataPath:
             return self.select_constant(const_signal)
         elif signal == 4:
             return self.address_register
-        raise ValueError(f"bad mux_a_sel {signal}")
+        raise ValueError(f"bad mux_b_sel {signal}")
 
 
     def select_constant(self, signal: int) -> int:

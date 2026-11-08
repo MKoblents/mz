@@ -31,7 +31,7 @@ class MemorySystem:
                 return 0, True
             self.check_address(address)
             if address in (OUT_PORT, IN_PORT):
-                self.access_io(address, write_data,read, write)
+                return self.access_io(address, write_data,read, write)
             self.pending_address = address
             self.pending_data = write_data
             self.wait = RAM_LATENCY - 1
@@ -85,6 +85,7 @@ class MemorySystem:
             if address != OUT_PORT:
                 raise ValueError(f"bad output port {address:#x}")
             self.io.write_out(write_data)
+            return 0, True
         if read:
             if address != IN_PORT:
                 raise ValueError(f"bad input port {address:#x}")

@@ -15,25 +15,25 @@ class Cache:
         word = (address >> 2) % WORDS_PER_LINE
         index = (address >> 4) % CACHE_LINES
         tag = address >> 10
-        return index, word, tag
+        return tag, index, word
 
     def lookup(self, address: int) -> bool:
-        tag, index, _ = self.split(address)
+        tag, index, _ = self.split_address(address)
         return self.valid[index] and self.tags[index] == tag
 
     def read_word(self, address: int) -> int:
-        _, index, word = self.split(address)
+        _, index, word = self.split_address(address)
         return self.data[index][word]
 
     def write_word(self, address: int, value: int) -> None:
-        _, index, word = self.split(address)
+        _, index, word = self.split_address(address)
         self.data[index][word] = value
 
     def invalidate(self, address: int) -> None:
-        _, index, _ = self.split(address)
+        _, index, _ = self.split_address(address)
         self.valid[index] = False
 
     def set_tag(self, address: int) -> None:
-        tag, index, _ = self.split(address)
+        tag, index, _ = self.split_address(address)
         self.tags[index] = tag
         self.valid[index] = True
