@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from isa import OPERAND_MAX, OPERAND_MIN, Opcode, to_signed
-from translation.image import Image, build_image
+from isa import OPERAND_MAX, OPERAND_MIN, Opcode, to_signed, write_image
+from translation.image import Image, build_image, listing
 from translation.models import DataRef, Instr, Operand, TranslationError
 from translation.primitives import PRIMITIVES
 from translation.tokens import Token, parse_number, tokenize
@@ -309,3 +309,19 @@ class Translator:
         if not self.entry or self.entry[-1].opcode is not Opcode.HALT:
             self.entry.append(Instr(Opcode.HALT))
         return build_image(self.code, self.entry, self.data, self.data_notes)
+
+    def translate_file(self) -> tuple[list[int], str]:
+        image = self.translate(self.base_dir.read_text(encoding="utf-8"))
+        return image.words, listing(image)
+
+
+    def run(self, argv: list[str]) -> None:
+        if len(argv) != 2:
+            raise SystemExit("usage: translator.py <source.fs> <target.bin>")
+        source = Path(argv[0])
+        words, text = self.translate_file(source)
+        write_image(argv[1], words)
+        Path(argv[1] + ".hex").write_text(text, encoding="utf-8")
+        lines = len(source.read_text(encoding="utf-8").splitlines())
+        print(f"source LoC: {lines} words: {len(words)}")
+
