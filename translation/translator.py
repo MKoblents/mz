@@ -310,8 +310,8 @@ class Translator:
             self.entry.append(Instr(Opcode.HALT))
         return build_image(self.code, self.entry, self.data, self.data_notes)
 
-    def translate_file(self) -> tuple[list[int], str]:
-        image = self.translate(self.base_dir.read_text(encoding="utf-8"))
+    def translate_file(self, source: Path) -> tuple[list[int], str]:
+        image = self.translate(source.read_text(encoding="utf-8"))
         return image.words, listing(image)
 
 
@@ -319,6 +319,7 @@ class Translator:
         if len(argv) != 2:
             raise SystemExit("usage: translator.py <source.fs> <target.bin>")
         source = Path(argv[0])
+        self.base_dir = source.parent
         words, text = self.translate_file(source)
         write_image(argv[1], words)
         Path(argv[1] + ".hex").write_text(text, encoding="utf-8")
