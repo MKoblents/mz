@@ -99,7 +99,9 @@ yaml.add_representer(str, str_presenter, Dumper=yaml.SafeDumper)
 def update_goldens() -> None:
     GOLDEN_DIR.mkdir(exist_ok=True)
     for name, example, stdin in CASES:
-        (GOLDEN_DIR / f"{name}.yml").write_text(dump(build_golden(name, example, stdin)), encoding="utf-8")
+        (GOLDEN_DIR / f"{name}.yml").write_text(
+            dump(build_golden(name, example, stdin)), encoding="utf-8"
+        )
 
 
 @pytest.mark.parametrize("path", sorted(GOLDEN_DIR.glob("*.yml")), ids=lambda p: p.stem)

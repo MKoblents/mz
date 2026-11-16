@@ -6,6 +6,7 @@ LABEL_COLUMN = 2
 BITS_COLUMN = 3
 ADDR_START = 30
 
+
 @dataclass(frozen=True)
 class Microinstruction:
     latch_s: bool
@@ -91,7 +92,9 @@ def load_microcode(path: str) -> tuple[list[Microinstruction], dict[str, int]]:
     labels = {label: index for index, (label, _) in enumerate(rows)}
     if len(labels) != len(rows):
         raise ValueError("duplicate microinstruction labels")
-    rom = [parse_microinstruction(cells_to_bits(label, cells, labels), label) for label, cells in rows]
+    rom = [
+        parse_microinstruction(cells_to_bits(label, cells, labels), label) for label, cells in rows
+    ]
     return rom, labels
 
 

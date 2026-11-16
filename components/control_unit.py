@@ -3,9 +3,11 @@ from memory.memory_system import MemorySystem
 from microcode.microcode import Microinstruction
 import logging
 
-DISPATCH=11
+DISPATCH = 11
 
 logger = logging.getLogger(__name__)
+
+
 class ControlUnit:
     def __init__(
         self,
@@ -54,7 +56,7 @@ class ControlUnit:
         if opcode not in self.decoder:
             raise ValueError(f"unknown opcode {opcode:#04x}")
         return self.decoder[opcode]
-        
+
     def get_next_mpc(self, micro: Microinstruction) -> int:
         select = self.select_next_mpc(micro.cond)
         if select == 1:
@@ -69,7 +71,7 @@ class ControlUnit:
             f"TICK: {self.ticks:6} MPC: {self.mpc:3} {micro.label:10} {state} "
             f"{self.data_path.snapshot()}"
         )
-    
+
     def tick(self) -> None:
         micro = self.mir
         data, ready = self.memory.tick(

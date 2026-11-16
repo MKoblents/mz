@@ -10,6 +10,7 @@ from isa import (
 )
 from translation.models import DataRef, Instr, TranslationError
 
+
 @dataclass(frozen=True)
 class Image:
     words: list[int]
@@ -17,7 +18,9 @@ class Image:
     notes: list[str]
 
 
-def build_image(code: list[Instr], entry: list[Instr], data: list[int], data_notes: list[str]) -> Image:
+def build_image(
+    code: list[Instr], entry: list[Instr], data: list[int], data_notes: list[str]
+) -> Image:
     code[0].operand = len(code) * 4
     instructions = code + entry
     data_base = len(instructions) * 4

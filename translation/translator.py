@@ -7,13 +7,14 @@ from translation.models import DataRef, Instr, Operand, TranslationError
 from translation.primitives import PRIMITIVES
 from translation.tokens import Token, parse_number, tokenize
 
+
 class Translator:
     def __init__(self, base_dir: Path) -> None:
         self.base_dir = base_dir
-        self.code:list[Instr] = [Instr(Opcode.JMP, 0, "entry")]
-        self.entry:list[Instr] = []
-        self.data:list[int] = []
-        self.data_notes:list[str] = []
+        self.code: list[Instr] = [Instr(Opcode.JMP, 0, "entry")]
+        self.entry: list[Instr] = []
+        self.data: list[int] = []
+        self.data_notes: list[str] = []
         self.target = self.entry
         self.words: dict[str, tuple[str, Operand]] = {}
         self.control: list[tuple[str, int, int]] = []
@@ -64,7 +65,7 @@ class Translator:
         if self.index >= len(self.tokens) or self.tokens[self.index].kind != "word":
             raise self.fail("name expected")
         return self.tokens[self.index].text
-    
+
     def start_definition(self) -> None:
         name = self.next_word()
         if self.in_definition:
@@ -107,7 +108,7 @@ class Translator:
         self.emit(Opcode.PUSH, self.string_ref(token.text), "string")
         if token.kind == "print":
             if "pstr-type" not in self.words:
-                raise self.fail("word pstr-type is required for .\"")
+                raise self.fail('word pstr-type is required for ."')
             self.emit(Opcode.CALL, self.words["pstr-type"][1], "pstr-type")
 
     def tick_word(self) -> None:
@@ -134,7 +135,7 @@ class Translator:
             return False
         handlers[word]()
         return True
-    
+
     def do_if(self) -> None:
         self.control.append(("if", self.emit(Opcode.JZ), 0))
 
@@ -315,7 +316,6 @@ class Translator:
         image = self.translate(source.read_text(encoding="utf-8"))
         return image.words, listing(image)
 
-
     def run(self, argv: list[str]) -> None:
         if len(argv) != 2:
             raise SystemExit("usage: translator.py <source.fs> <target.bin>")
@@ -326,6 +326,7 @@ class Translator:
         Path(argv[1] + ".hex").write_text(text, encoding="utf-8")
         lines = len(source.read_text(encoding="utf-8").splitlines())
         print(f"source LoC: {lines} words: {len(words)}")
+
 
 if __name__ == "__main__":
     Translator(Path(".")).run(sys.argv[1:])

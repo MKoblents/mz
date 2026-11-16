@@ -1,4 +1,5 @@
 from enum import IntEnum
+
 WORD_BITS = 32
 WORD_MASK = 0xFFFFFFFF
 SIGN_BIT = 0x80000000
@@ -54,7 +55,6 @@ ADDRESS_OPCODES = {Opcode.CALL, Opcode.JZ, Opcode.JMP, Opcode.JNZ}
 OPERAND_OPCODES = ADDRESS_OPCODES | {Opcode.PUSH}
 
 
-
 def to_unsigned(value: int) -> int:
     return value & WORD_MASK
 
@@ -68,6 +68,7 @@ def sign_extend(value: int, bits: int) -> int:
     masked = value & ((1 << bits) - 1)
     sign = 1 << (bits - 1)
     return to_unsigned((masked ^ sign) - sign)
+
 
 def encode(opcode: Opcode, operand: int = 0) -> int:
     if not OPERAND_MIN <= operand <= OPERAND_MAX:

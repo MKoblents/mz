@@ -14,12 +14,14 @@ from isa import (
     to_unsigned,
 )
 
+
 @dataclass(frozen=True)
 class Flags:
     n: bool = False
     z: bool = False
     v: bool = False
     c: bool = False
+
 
 ALU_PLUS = 0
 ALU_MINUS = 1
@@ -34,22 +36,23 @@ ALU_PASS_B = 9
 ALU_SHL = 10
 ALU_SHR = 11
 
+
 class DataPath:
-    def __init__(self)->None:
-        self.second=0
-        self.program_counter=0
-        self.stack_pointer=DATA_STACK_INIT
-        self.return_stack_pointer=RETURN_STACK_INIT
-        self.data_register=0
-        self.return_register=0
-        self.top=0
-        self.address_register=0
-        self.instruction_register=0
-        self.status_register=Flags()
+    def __init__(self) -> None:
+        self.second = 0
+        self.program_counter = 0
+        self.stack_pointer = DATA_STACK_INIT
+        self.return_stack_pointer = RETURN_STACK_INIT
+        self.data_register = 0
+        self.return_register = 0
+        self.top = 0
+        self.address_register = 0
+        self.instruction_register = 0
+        self.status_register = Flags()
 
     def opcode(self) -> int:
         return self.instruction_register >> OPCODE_SHIFT
-    
+
     def select_a(self, signal):
         if signal == 0:
             return sign_extend(self.instruction_register, OPERAND_BITS)
@@ -65,7 +68,6 @@ class DataPath:
             return self.data_register
         raise ValueError(f"bad mux_a_sel {signal}")
 
-
     def divide(self, op: int, a: int, b: int) -> int:
         dividend, divisor = to_signed(a), to_signed(b)
         if divisor == 0:
@@ -77,8 +79,7 @@ class DataPath:
             return to_unsigned(quotient)
         return to_unsigned(dividend - quotient * divisor)
 
-
-    def select_b(self, signal:int, const_signal:int = None) -> int:
+    def select_b(self, signal: int, const_signal: int = None) -> int:
         if signal == 0:
             return self.data_register
         elif signal == 1:
@@ -91,13 +92,12 @@ class DataPath:
             return self.address_register
         raise ValueError(f"bad mux_b_sel {signal}")
 
-
     def select_constant(self, signal: int) -> int:
         constants = {0: 0, 1: 1, 2: 4, 3: 8}
         if signal not in constants:
             raise ValueError(f"bad const_sel {signal}")
         return constants[signal]
-        
+
     def select_alu(self, signal: int, A: int, B: int) -> tuple[int, Flags]:
         carry = False
         overflow = False
@@ -173,4 +173,3 @@ class DataPath:
             self.instruction_register = result
         if micro.latch_sr:
             self.status_register = flags
-    

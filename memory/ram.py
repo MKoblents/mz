@@ -2,6 +2,7 @@ from isa import MEMORY_BYTES, WORD_MASK
 
 RAM_LATENCY = 10
 
+
 class Ram:
     def __init__(self) -> None:
         self.words = [0] * (MEMORY_BYTES // 4)

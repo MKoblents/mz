@@ -1,10 +1,10 @@
-
 CACHE_LINES = 64
 WORDS_PER_LINE = 4
 LINE_BYTES = WORDS_PER_LINE * 4
 
+
 class Cache:
-    def __init__(self)->None:
+    def __init__(self) -> None:
         self.tags = [0] * CACHE_LINES
         self.data = [[0] * WORDS_PER_LINE for _ in range(CACHE_LINES)]
         self.valid = [False] * CACHE_LINES
