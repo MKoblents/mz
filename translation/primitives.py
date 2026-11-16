@@ -1,0 +1,57 @@
+from isa import IN_PORT, OUT_PORT, Opcode
+from translation.models import Operand
+
+
+def push(value: int) -> tuple[Opcode, Operand]:
+    return Opcode.PUSH, value
+
+
+PRIMITIVES: dict[str, list[tuple[Opcode, Operand]]] = {
+    "dup": [(Opcode.DUP, 0)],
+    "drop": [(Opcode.DROP, 0)],
+    "swap": [(Opcode.SWAP, 0)],
+    "over": [(Opcode.OVER, 0)],
+    "+": [(Opcode.ADD, 0)],
+    "-": [(Opcode.SUB, 0)],
+    "*": [(Opcode.MUL, 0)],
+    "/": [(Opcode.DIV, 0)],
+    "mod": [(Opcode.MOD, 0)],
+    "and": [(Opcode.AND, 0)],
+    "or": [(Opcode.OR, 0)],
+    "xor": [(Opcode.XOR, 0)],
+    "lshift": [(Opcode.SHL, 0)],
+    "rshift": [(Opcode.SHR, 0)],
+    "=": [(Opcode.EQ, 0)],
+    "<": [(Opcode.LT, 0)],
+    ">": [(Opcode.GT, 0)],
+    "u<": [(Opcode.ULT, 0)],
+    ">r": [(Opcode.TOR, 0)],
+    "r>": [(Opcode.FROMR, 0)],
+    "r@": [(Opcode.RFETCH, 0)],
+    "i": [(Opcode.RFETCH, 0)],
+    "@": [(Opcode.LOAD, 0)],
+    "!": [(Opcode.STORE, 0)],
+    "execute": [(Opcode.EXEC, 0)],
+    "bye": [(Opcode.HALT, 0)],
+    "exit": [(Opcode.RET, 0)],
+    "rot": [(Opcode.TOR, 0), (Opcode.SWAP, 0), (Opcode.FROMR, 0), (Opcode.SWAP, 0)],
+    "2dup": [(Opcode.OVER, 0), (Opcode.OVER, 0)],
+    "2drop": [(Opcode.DROP, 0), (Opcode.DROP, 0)],
+    "1+": [push(1), (Opcode.ADD, 0)],
+    "1-": [push(1), (Opcode.SUB, 0)],
+    "negate": [push(0), (Opcode.SWAP, 0), (Opcode.SUB, 0)],
+    "0=": [push(0), (Opcode.EQ, 0)],
+    "0<": [push(0), (Opcode.LT, 0)],
+    "0>": [push(0), (Opcode.GT, 0)],
+    "invert": [push(-1), (Opcode.XOR, 0)],
+    "<>": [(Opcode.EQ, 0), push(-1), (Opcode.XOR, 0)],
+    "<=": [(Opcode.GT, 0), push(-1), (Opcode.XOR, 0)],
+    ">=": [(Opcode.LT, 0), push(-1), (Opcode.XOR, 0)],
+    "cells": [push(4), (Opcode.MUL, 0)],
+    "true": [push(-1)],
+    "false": [push(0)],
+    "key": [push(IN_PORT), (Opcode.LOAD, 0)],
+    "emit": [push(OUT_PORT), (Opcode.STORE, 0)],
+    "cr": [push(10), push(OUT_PORT), (Opcode.STORE, 0)],
+    "space": [push(32), push(OUT_PORT), (Opcode.STORE, 0)],
+}
