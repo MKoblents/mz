@@ -4,3 +4,8 @@ notes
 .idea/
 __pycache__/
 */__pycache__/
+out/
+.venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
