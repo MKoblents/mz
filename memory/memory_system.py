@@ -1,4 +1,7 @@
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 from enum import Enum
 
@@ -37,16 +40,22 @@ class MemorySystem:
             self.wait = RAM_LATENCY - 1
             if write:
                 if self.cache_enabled and self.cache.lookup(address):
+                    logger.debug("CACHE write hit  addr=%#06x: write to RAM", address)
                     self.cache.write_word(address, write_data)
+                else:
+                     logger.debug("CACHE write miss addr=%#06x: write to RAM only", address)
                 self.state=State.WRITE_RAM
                 return 0, False
             if not self.cache_enabled:
+                logger.debug("CACHE off: RAM read addr=%#06x", address)
                 self.state = State.READ_RAM
                 return 0, False
             if self.cache.lookup(address):
+                logger.debug("CACHE read hit  addr=%#06x", address)
                 self.cache.hits += 1
                 self.wait = 0
                 return self.cache.read_word(address), True
+            logger.debug("CACHE read miss addr=%#06x: filling the line", address)
             self.cache.misses += 1
             self.cache.invalidate(address)
             self.fill_index = 0
@@ -64,6 +73,7 @@ class MemorySystem:
             return self.ram.read(self.pending_address), True
         line_base = self.pending_address - self.pending_address % LINE_BYTES
         word_address = line_base + self.fill_index * 4
+        logger.debug("CACHE fill word %d addr=%#06x", self.fill_index, word_address)
         self.cache.write_word(word_address, self.ram.read(word_address))
         self.fill_index += 1
         if self.fill_index < WORDS_PER_LINE:

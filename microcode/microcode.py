@@ -6,7 +6,7 @@ LABEL_COLUMN = 2
 BITS_COLUMN = 3
 ADDR_START = 30
 
-
+@dataclass(frozen=True)
 class Microinstruction:
     latch_s: bool
     latch_pc: bool

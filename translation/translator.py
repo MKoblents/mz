@@ -1,4 +1,5 @@
 from pathlib import Path
+import sys
 
 from isa import OPERAND_MAX, OPERAND_MIN, Opcode, to_signed, write_image
 from translation.image import Image, build_image, listing
@@ -326,3 +327,5 @@ class Translator:
         lines = len(source.read_text(encoding="utf-8").splitlines())
         print(f"source LoC: {lines} words: {len(words)}")
 
+if __name__ == "__main__":
+    Translator(Path(".")).run(sys.argv[1:])

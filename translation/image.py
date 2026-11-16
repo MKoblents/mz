@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+
 from isa import (
     ADDRESS_OPCODES,
     IMAGE_LIMIT,
@@ -8,7 +10,7 @@ from isa import (
 )
 from translation.models import DataRef, Instr, TranslationError
 
-
+@dataclass(frozen=True)
 class Image:
     words: list[int]
     instruction_count: int

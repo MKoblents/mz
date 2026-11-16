@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+
 from microcode.microcode import Microinstruction
 
 from isa import (
@@ -12,7 +14,7 @@ from isa import (
     to_unsigned,
 )
 
-
+@dataclass(frozen=True)
 class Flags:
     n: bool = False
     z: bool = False
@@ -71,9 +73,9 @@ class DataPath:
         quotient = abs(dividend) // abs(divisor)
         if (dividend < 0) != (divisor < 0):
             quotient = -quotient
-        if op == 5:
-            return int(quotient)
-        return int(dividend - quotient * divisor)
+        if op == ALU_DIV:
+            return to_unsigned(quotient)
+        return to_unsigned(dividend - quotient * divisor)
 
 
     def select_b(self, signal:int, const_signal:int = None) -> int:

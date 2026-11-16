@@ -1,9 +1,11 @@
 from components.data_path import DataPath
 from memory.memory_system import MemorySystem
 from microcode.microcode import Microinstruction
+import logging
 
 DISPATCH=11
 
+logger = logging.getLogger(__name__)
 class ControlUnit:
     def __init__(
         self,
@@ -64,7 +66,7 @@ class ControlUnit:
     def snapshot(self, micro: Microinstruction, waiting: bool) -> str:
         state = "WAIT" if waiting else "EXEC"
         return (
-            f"TICK: {self.ticks:5} MPC: {self.mpc:3} {micro.label:10} {state} "
+            f"TICK: {self.ticks:6} MPC: {self.mpc:3} {micro.label:10} {state} "
             f"{self.data_path.snapshot()}"
         )
     
@@ -78,6 +80,7 @@ class ControlUnit:
         )
         self.ticks += 1
         waiting = (micro.mem_rd or micro.mem_wr) and not ready
+        logger.debug(self.snapshot(micro, waiting))
         if waiting:
             return
         if micro.halt:

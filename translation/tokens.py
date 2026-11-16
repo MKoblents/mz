@@ -5,7 +5,7 @@ from translation.models import TranslationError
 
 NUMBER = re.compile(r"^(-?\d+|0x[0-9a-fA-F]+|\$[0-9a-fA-F]+)$")
 
-
+@dataclass(frozen=True)
 class Token:
     kind: str
     text: str
