@@ -400,15 +400,7 @@ bye
 ---
 
 ## Модель процессора
-
-
-<!-- TODO: вставить экспортированные схемы -->
-
-![DataPath](docs/datapath.png)
-
-![ControlUnit](docs/control_unit.png)
-
-![Кеш и память](docs/cache.png)
+![image](scheme.drawio.svg)
 
 ### DataPath
 
