@@ -406,7 +406,7 @@ Control Unit
 ![image](docs/scheme-Page-2.drawio.svg)
 
 все вместе
-![image](scheme.drawio.svg)
+![image](docs/scheme.drawio.svg)
 ### DataPath
 
 Реализован в классе `DataPath` (`components/data_path.py`). Результат АЛУ по общей шине поступает на входы всех регистров; другого способа переслать значение из регистра в регистр нет (используются проходы `passA`/`passB`). За такт по шине выходит один результат, который может быть защёлкнут сразу в несколько регистров.
