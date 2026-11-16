@@ -79,6 +79,8 @@ class DataPath:
         return to_unsigned(dividend - quotient * divisor)
 
     def select_b(self, signal: int, const_signal: int | None = None) -> int:
+        if const_signal is None:
+            raise ValueError("const_signal is required when selecting a constant")
         if signal == 0:
             return self.data_register
         if signal == 1:
