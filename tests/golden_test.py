@@ -93,7 +93,7 @@ def str_presenter(dumper: yaml.Dumper, value: str) -> yaml.ScalarNode:
     return dumper.represent_scalar("tag:yaml.org,2002:str", value, style=style)
 
 
-yaml.add_representer(str, str_presenter, Dumper=yaml.SafeDumper) # type: ignore[arg-type]
+yaml.add_representer(str, str_presenter, Dumper=yaml.SafeDumper)  # type: ignore[arg-type]
 
 
 def update_goldens() -> None:
