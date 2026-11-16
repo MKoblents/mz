@@ -45,7 +45,7 @@ class Capture(logging.Handler):
 def trim(lines: list[str]) -> str:
     if len(lines) > LOG_HEAD + LOG_TAIL:
         skipped = len(lines) - LOG_HEAD - LOG_TAIL
-        lines = lines[:LOG_HEAD] + [f"... {skipped} lines skipped ..."] + lines[-LOG_TAIL:]
+        lines = [*lines[:LOG_HEAD], f"... {skipped} lines skipped ...", *lines[-LOG_TAIL:]]
     return "\n".join(lines) + "\n"
 
 
@@ -61,11 +61,11 @@ def run_case(source_text: str, stdin: str) -> dict[str, object]:
     logger.addHandler(capture)
     logger.setLevel(logging.DEBUG)
     try:
-        output, control_unit, memory = simulation(image, stdin, LIMIT, True)
+        output, control_unit, memory = simulation(image, stdin, LIMIT, cache_enabled=True)
     finally:
         logger.removeHandler(capture)
         logger.setLevel(old_level)
-    _, plain_unit, _ = simulation(image, stdin, LIMIT, False)
+    _, plain_unit, _ = simulation(image, stdin, LIMIT, cache_enabled=False)
     return {
         "out_code": code,
         "out_stdout": output,
@@ -77,7 +77,7 @@ def run_case(source_text: str, stdin: str) -> dict[str, object]:
     }
 
 
-def build_golden(name: str, example: str, stdin: str) -> dict[str, object]:
+def build_golden(_name: str, example: str, stdin: str) -> dict[str, object]:
     source_text = (EXAMPLES_DIR / example).read_text(encoding="utf-8")
     data: dict[str, object] = {"in_source": source_text, "in_stdin": stdin}
     data.update(run_case(source_text, stdin))

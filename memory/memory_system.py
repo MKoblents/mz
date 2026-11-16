@@ -1,13 +1,12 @@
 import logging
-
-logger = logging.getLogger(__name__)
-
 from enum import Enum
 
-from memory.cache import Cache, WORDS_PER_LINE, LINE_BYTES
+from isa import IN_PORT, MEMORY_BYTES, OUT_PORT
+from memory.cache import LINE_BYTES, WORDS_PER_LINE, Cache
 from memory.io_ports import IOPorts
-from memory.ram import Ram, RAM_LATENCY
-from isa import MEMORY_BYTES, OUT_PORT, IN_PORT
+from memory.ram import RAM_LATENCY, Ram
+
+logger = logging.getLogger(__name__)
 
 
 class State(Enum):

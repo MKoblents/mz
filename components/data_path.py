@@ -1,7 +1,5 @@
 from dataclasses import dataclass
 
-from microcode.microcode import Microinstruction
-
 from isa import (
     DATA_STACK_INIT,
     OPCODE_SHIFT,
@@ -13,6 +11,7 @@ from isa import (
     to_signed,
     to_unsigned,
 )
+from microcode.microcode import Microinstruction
 
 
 @dataclass(frozen=True)
@@ -53,18 +52,18 @@ class DataPath:
     def opcode(self) -> int:
         return self.instruction_register >> OPCODE_SHIFT
 
-    def select_a(self, signal):
+    def select_a(self, signal: int) -> int:
         if signal == 0:
             return sign_extend(self.instruction_register, OPERAND_BITS)
-        elif signal == 1:
+        if signal == 1:
             return self.second
-        elif signal == 2:
+        if signal == 2:
             return self.program_counter
-        elif signal == 3:
+        if signal == 3:
             return self.stack_pointer
-        elif signal == 4:
+        if signal == 4:
             return self.return_stack_pointer
-        elif signal == 5:
+        if signal == 5:
             return self.data_register
         raise ValueError(f"bad mux_a_sel {signal}")
 
@@ -79,16 +78,16 @@ class DataPath:
             return to_unsigned(quotient)
         return to_unsigned(dividend - quotient * divisor)
 
-    def select_b(self, signal: int, const_signal: int = None) -> int:
+    def select_b(self, signal: int, const_signal: int | None = None) -> int:
         if signal == 0:
             return self.data_register
-        elif signal == 1:
+        if signal == 1:
             return self.return_register
-        elif signal == 2:
+        if signal == 2:
             return self.top
-        elif signal == 3:
+        if signal == 3:
             return self.select_constant(const_signal)
-        elif signal == 4:
+        if signal == 4:
             return self.address_register
         raise ValueError(f"bad mux_b_sel {signal}")
 
@@ -98,36 +97,36 @@ class DataPath:
             raise ValueError(f"bad const_sel {signal}")
         return constants[signal]
 
-    def select_alu(self, signal: int, A: int, B: int) -> tuple[int, Flags]:
+    def select_alu(self, signal: int, a: int, b: int) -> tuple[int, Flags]:
         carry = False
         overflow = False
         if signal == ALU_PLUS:
-            full = A + B
+            full = a + b
             result = full & WORD_MASK
             carry = full > WORD_MASK
-            overflow = bool((A ^ result) & (B ^ result) & SIGN_BIT)
+            overflow = bool((a ^ result) & (b ^ result) & SIGN_BIT)
         elif signal == ALU_MINUS:
-            result = (A - B) & WORD_MASK
-            carry = A < B
-            overflow = bool((A ^ B) & (A ^ result) & SIGN_BIT)
+            result = (a - b) & WORD_MASK
+            carry = a < b
+            overflow = bool((a ^ b) & (a ^ result) & SIGN_BIT)
         elif signal == ALU_MUL:
-            result = to_unsigned(to_signed(A) * to_signed(B))
+            result = to_unsigned(to_signed(a) * to_signed(b))
         elif signal in (ALU_DIV, ALU_MOD):
-            result = self.divide(signal, A, B)
+            result = self.divide(signal, a, b)
         elif signal == ALU_AND:
-            result = A & B
+            result = a & b
         elif signal == ALU_OR:
-            result = A | B
+            result = a | b
         elif signal == ALU_XOR:
-            result = A ^ B
+            result = a ^ b
         elif signal == ALU_PASS_A:
-            result = A
+            result = a
         elif signal == ALU_PASS_B:
-            result = B
+            result = b
         elif signal == ALU_SHL:
-            result = to_unsigned(A << (B & 31))
+            result = to_unsigned(a << (b & 31))
         elif signal == ALU_SHR:
-            result = A >> (B & 31)
+            result = a >> (b & 31)
         else:
             raise ValueError(f"bad alu_op {signal}")
         flags = Flags(n=bool(result & SIGN_BIT), z=result == 0, v=overflow, c=carry)

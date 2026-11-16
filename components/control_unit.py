@@ -1,7 +1,8 @@
+import logging
+
 from components.data_path import DataPath
 from memory.memory_system import MemorySystem
 from microcode.microcode import Microinstruction
-import logging
 
 DISPATCH = 11
 

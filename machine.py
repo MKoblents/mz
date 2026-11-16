@@ -46,7 +46,7 @@ def main(argv: list[str]) -> None:
         logging.basicConfig(
             filename=args.journal, filemode="w", level=logging.DEBUG, format="%(message)s"
         )
-    with open(args.input, encoding="utf-8") as file:
+    with Path(args.input).open(encoding="utf-8") as file:
         input_text = file.read()
     output, control_unit, memory = simulation(
         read_image(args.image), input_text, args.limit, not args.no_cache

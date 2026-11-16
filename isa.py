@@ -1,4 +1,5 @@
 from enum import IntEnum
+from pathlib import Path
 
 WORD_BITS = 32
 WORD_MASK = 0xFFFFFFFF
@@ -93,13 +94,12 @@ def format_instruction(word: int) -> str:
 
 
 def write_image(path: str, words: list[int]) -> None:
-    with open(path, "wb") as file:
-        for word in words:
-            file.write(to_unsigned(word).to_bytes(4, "little"))
+    with Path(path).open("wb") as file:
+        file.writelines(to_unsigned(word).to_bytes(4, "little") for word in words)
 
 
 def read_image(path: str) -> list[int]:
-    with open(path, "rb") as file:
+    with Path(path).open("rb") as file:
         data = file.read()
     if len(data) % 4:
         raise ValueError("image size is not a multiple of 4")

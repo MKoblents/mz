@@ -1,5 +1,6 @@
 import csv
 from dataclasses import dataclass
+from pathlib import Path
 
 MICROCODE_WIDTH = 39
 LABEL_COLUMN = 2
@@ -84,7 +85,7 @@ def cells_to_bits(label: str, cells: list[str], labels: dict[str, int]) -> str:
 
 def load_microcode(path: str) -> tuple[list[Microinstruction], dict[str, int]]:
     rows: list[tuple[str, list[str]]] = []
-    with open(path, newline="", encoding="utf-8") as file:
+    with Path(path).open(newline="", encoding="utf-8") as file:
         for row in csv.reader(file):
             label = row[LABEL_COLUMN].strip() if len(row) > LABEL_COLUMN else ""
             if label and label != "метка":
@@ -100,7 +101,7 @@ def load_microcode(path: str) -> tuple[list[Microinstruction], dict[str, int]]:
 
 def load_decoder(path: str, labels: dict[str, int]) -> dict[int, int]:
     decoder: dict[int, int] = {}
-    with open(path, newline="", encoding="utf-8") as file:
+    with Path(path).open(newline="", encoding="utf-8") as file:
         for row in csv.reader(file):
             if len(row) < 2 or not row[0].strip():
                 continue

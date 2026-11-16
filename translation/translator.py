@@ -1,5 +1,5 @@
-from pathlib import Path
 import sys
+from pathlib import Path
 
 from isa import OPERAND_MAX, OPERAND_MIN, Opcode, to_signed, write_image
 from translation.image import Image, build_image, listing
@@ -91,7 +91,8 @@ class Translator:
             elif kind == "var":
                 self.emit(Opcode.PUSH, value, word)
             else:
-                assert isinstance(value, int)
+                if not isinstance(value, int):
+                    raise TypeError(f"expected int, got {type(value).__name__}")
                 self.emit_literal(value)
             return
         if word in PRIMITIVES:
@@ -286,7 +287,8 @@ class Translator:
             self.constants.append(number)
         elif word in self.words and self.words[word][0] == "const":
             value = self.words[word][1]
-            assert isinstance(value, int)
+            if not isinstance(value, int):
+                raise TypeError(f"expected int, got {type(value).__name__}")
             self.constants.append(value)
         elif not self.define_data(word):
             self.flush_constants()
@@ -329,4 +331,4 @@ class Translator:
 
 
 if __name__ == "__main__":
-    Translator(Path(".")).run(sys.argv[1:])
+    Translator(Path()).run(sys.argv[1:])
