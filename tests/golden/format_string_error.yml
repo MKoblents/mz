@@ -1,0 +1,916 @@
+in_source: |
+  include lib.fs
+
+  create fmt-buf 40 cells allot
+  create vals 16 cells allot
+  variable fmt
+  variable bad
+  variable cnt
+  variable vi
+  variable left
+  variable width
+  variable spec-end
+  variable acc
+  variable sgn
+  variable nd
+  variable dgt
+
+  : fmt-len fmt @ @ ;
+  : fmt-at dup fmt-len < if 1+ cells fmt @ + @ else drop 0 then ;
+
+  : sp-n begin dup 0 > while space 1- repeat drop ;
+
+  : digits 1 swap begin 10 / dup while swap 1+ swap repeat drop ;
+
+  : int-len dup 0< if negate digits 1+ else digits then ;
+
+  : print-int
+    dup 0< if
+      [char] - emit
+      dup $80000000 = if drop ." 2147483648" exit then
+      negate
+    then
+    print-num ;
+
+  : print-padded
+    dup int-len width @ swap -
+    left @ 0= if dup sp-n then
+    swap print-int
+    left @ if sp-n else drop then ;
+
+  : parse-spec
+    1+
+    0 left ! 0 width !
+    dup fmt-at [char] - = if -1 left ! 1+ then
+    begin dup fmt-at digit? while
+      width @ 10 * over fmt-at [char] 0 - + width !
+      1+
+    repeat
+    dup fmt-at [char] d = if 1+ spec-end ! -1 else drop 0 then ;
+
+  : count-specs
+    0 cnt !
+    0
+    begin dup fmt-len < while
+      dup fmt-at [char] % = if
+        dup parse-spec if drop spec-end @ cnt @ 1+ cnt ! else 1+ then
+      else 1+ then
+    repeat
+    drop ;
+
+  : read-fmt
+    0
+    begin key dup 10 <> while
+      over 32 < if
+        over 1+ cells fmt-buf + !
+        1+
+      else
+        drop -1 bad !
+      then
+    repeat
+    drop fmt-buf ! ;
+
+  : overflow?
+    214748364 acc @ u<
+    acc @ 214748364 = dgt @ 8 > and or ;
+
+  : read-int-line
+    0 acc ! 1 sgn ! 0 nd !
+    key
+    dup [char] - = if drop -1 sgn ! key else dup [char] + = if drop key then then
+    begin dup 10 <> while
+      bad @ 0= if
+        dup digit? if
+          [char] 0 - dgt !
+          overflow? if -1 bad ! else acc @ 10 * dgt @ + acc ! then
+          nd @ 1+ nd !
+        else drop -1 bad ! then
+      else drop then
+      key
+    repeat
+    drop
+    nd @ 0= if -1 bad ! then
+    sgn @ 1 = 2147483647 acc @ u< and if -1 bad ! then
+    acc @ sgn @ * ;
+
+  : read-vals
+    cnt @ 0 ?do read-int-line i cells vals + ! loop ;
+
+  : print-formatted
+    0 vi !
+    0
+    begin dup fmt-len < while
+      dup fmt-at [char] % = if
+        dup parse-spec if
+          drop spec-end @
+          vi @ cells vals + @ print-padded
+          vi @ 1+ vi !
+        else
+          [char] % emit 1+
+        then
+      else
+        dup fmt-at emit 1+
+      then
+    repeat
+    drop ;
+
+  : main
+    0 bad !
+    fmt-buf fmt !
+    read-fmt
+    bad @ if ." -1" cr exit then
+    count-specs
+    read-vals
+    bad @ if ." -1" cr exit then
+    print-formatted cr ;
+
+  main
+  bye
+in_stdin: |
+  %d
+  abc
+out_code: |
+  0000 - 310009AC - jmp 0x09ac ; entry
+  0004 - 0A000030 - push 48
+  0008 - 12000000 - sub
+  000c - 0A00000A - push 10
+  0010 - 1C000000 - ult
+  0014 - 05000000 - ret
+  0018 - 0A00FFF0 - push 65520
+  001c - 20000000 - load
+  0020 - 01000000 - dup
+  0024 - 10000004 - call 0x0004 ; digit?
+  0028 - 0A000000 - push 0
+  002c - 19000000 - eq
+  0030 - 3000003C - jz 0x003c
+  0034 - 02000000 - drop
+  0038 - 31000018 - jmp 0x0018
+  003c - 0A000030 - push 48
+  0040 - 12000000 - sub
+  0044 - 0A00FFF0 - push 65520
+  0048 - 20000000 - load
+  004c - 01000000 - dup
+  0050 - 10000004 - call 0x0004 ; digit?
+  0054 - 30000074 - jz 0x0074
+  0058 - 0A000030 - push 48
+  005c - 12000000 - sub
+  0060 - 03000000 - swap
+  0064 - 0A00000A - push 10
+  0068 - 13000000 - mul
+  006c - 11000000 - add
+  0070 - 31000044 - jmp 0x0044
+  0074 - 02000000 - drop
+  0078 - 05000000 - ret
+  007c - 0A000000 - push 0
+  0080 - 0A0009B4 - push 2484
+  0084 - 21000000 - store
+  0088 - 0A00FFF0 - push 65520
+  008c - 20000000 - load
+  0090 - 01000000 - dup
+  0094 - 10000004 - call 0x0004 ; digit?
+  0098 - 04000000 - over
+  009c - 0A00002D - push 45
+  00a0 - 19000000 - eq
+  00a4 - 17000000 - or
+  00a8 - 0A000000 - push 0
+  00ac - 19000000 - eq
+  00b0 - 300000BC - jz 0x00bc
+  00b4 - 02000000 - drop
+  00b8 - 31000088 - jmp 0x0088
+  00bc - 01000000 - dup
+  00c0 - 0A00002D - push 45
+  00c4 - 19000000 - eq
+  00c8 - 300000E4 - jz 0x00e4
+  00cc - 0AFFFFFF - push -1
+  00d0 - 0A0009B4 - push 2484
+  00d4 - 21000000 - store
+  00d8 - 02000000 - drop
+  00dc - 0A00FFF0 - push 65520
+  00e0 - 20000000 - load
+  00e4 - 0A000030 - push 48
+  00e8 - 12000000 - sub
+  00ec - 0A00FFF0 - push 65520
+  00f0 - 20000000 - load
+  00f4 - 01000000 - dup
+  00f8 - 10000004 - call 0x0004 ; digit?
+  00fc - 3000011C - jz 0x011c
+  0100 - 0A000030 - push 48
+  0104 - 12000000 - sub
+  0108 - 03000000 - swap
+  010c - 0A00000A - push 10
+  0110 - 13000000 - mul
+  0114 - 11000000 - add
+  0118 - 310000EC - jmp 0x00ec
+  011c - 02000000 - drop
+  0120 - 0A0009B4 - push 2484
+  0124 - 20000000 - load
+  0128 - 30000138 - jz 0x0138
+  012c - 0A000000 - push 0
+  0130 - 03000000 - swap
+  0134 - 12000000 - sub
+  0138 - 05000000 - ret
+  013c - 01000000 - dup
+  0140 - 0A00000A - push 10
+  0144 - 1C000000 - ult
+  0148 - 30000160 - jz 0x0160
+  014c - 0A000030 - push 48
+  0150 - 11000000 - add
+  0154 - 0A00FFF4 - push 65524
+  0158 - 21000000 - store
+  015c - 05000000 - ret
+  0160 - 01000000 - dup
+  0164 - 0A00000A - push 10
+  0168 - 14000000 - div
+  016c - 1000013C - call 0x013c ; print-num
+  0170 - 0A00000A - push 10
+  0174 - 15000000 - mod
+  0178 - 0A000030 - push 48
+  017c - 11000000 - add
+  0180 - 0A00FFF4 - push 65524
+  0184 - 21000000 - store
+  0188 - 05000000 - ret
+  018c - 01000000 - dup
+  0190 - 20000000 - load
+  0194 - 0A000000 - push 0
+  0198 - 04000000 - over
+  019c - 04000000 - over
+  01a0 - 19000000 - eq
+  01a4 - 300001B4 - jz 0x01b4
+  01a8 - 02000000 - drop
+  01ac - 02000000 - drop
+  01b0 - 31000218 - jmp 0x0218
+  01b4 - 03000000 - swap
+  01b8 - 06000000 - tor
+  01bc - 06000000 - tor
+  01c0 - 01000000 - dup
+  01c4 - 08000000 - rfetch
+  01c8 - 0A000001 - push 1
+  01cc - 11000000 - add
+  01d0 - 0A000004 - push 4
+  01d4 - 13000000 - mul
+  01d8 - 11000000 - add
+  01dc - 20000000 - load
+  01e0 - 0A00FFF4 - push 65524
+  01e4 - 21000000 - store
+  01e8 - 07000000 - fromr
+  01ec - 0A000001 - push 1
+  01f0 - 11000000 - add
+  01f4 - 08000000 - rfetch
+  01f8 - 04000000 - over
+  01fc - 19000000 - eq
+  0200 - 3200020C - jnz 0x020c
+  0204 - 06000000 - tor
+  0208 - 310001C0 - jmp 0x01c0
+  020c - 02000000 - drop
+  0210 - 07000000 - fromr
+  0214 - 02000000 - drop
+  0218 - 02000000 - drop
+  021c - 05000000 - ret
+  0220 - 0A000000 - push 0
+  0224 - 0A00FFF0 - push 65520
+  0228 - 20000000 - load
+  022c - 01000000 - dup
+  0230 - 0A00000A - push 10
+  0234 - 19000000 - eq
+  0238 - 0A000000 - push 0
+  023c - 19000000 - eq
+  0240 - 3000027C - jz 0x027c
+  0244 - 06000000 - tor
+  0248 - 04000000 - over
+  024c - 04000000 - over
+  0250 - 0A000001 - push 1
+  0254 - 11000000 - add
+  0258 - 0A000004 - push 4
+  025c - 13000000 - mul
+  0260 - 11000000 - add
+  0264 - 07000000 - fromr
+  0268 - 03000000 - swap
+  026c - 21000000 - store
+  0270 - 0A000001 - push 1
+  0274 - 11000000 - add
+  0278 - 31000224 - jmp 0x0224
+  027c - 02000000 - drop
+  0280 - 03000000 - swap
+  0284 - 21000000 - store
+  0288 - 05000000 - ret
+  028c - 0A000A98 - push 2712
+  0290 - 20000000 - load
+  0294 - 20000000 - load
+  0298 - 05000000 - ret
+  029c - 01000000 - dup
+  02a0 - 1000028C - call 0x028c ; fmt-len
+  02a4 - 1A000000 - lt
+  02a8 - 300002D0 - jz 0x02d0
+  02ac - 0A000001 - push 1
+  02b0 - 11000000 - add
+  02b4 - 0A000004 - push 4
+  02b8 - 13000000 - mul
+  02bc - 0A000A98 - push 2712
+  02c0 - 20000000 - load
+  02c4 - 11000000 - add
+  02c8 - 20000000 - load
+  02cc - 310002D8 - jmp 0x02d8
+  02d0 - 02000000 - drop
+  02d4 - 0A000000 - push 0
+  02d8 - 05000000 - ret
+  02dc - 01000000 - dup
+  02e0 - 0A000000 - push 0
+  02e4 - 1B000000 - gt
+  02e8 - 30000304 - jz 0x0304
+  02ec - 0A000020 - push 32
+  02f0 - 0A00FFF4 - push 65524
+  02f4 - 21000000 - store
+  02f8 - 0A000001 - push 1
+  02fc - 12000000 - sub
+  0300 - 310002DC - jmp 0x02dc
+  0304 - 02000000 - drop
+  0308 - 05000000 - ret
+  030c - 0A000001 - push 1
+  0310 - 03000000 - swap
+  0314 - 0A00000A - push 10
+  0318 - 14000000 - div
+  031c - 01000000 - dup
+  0320 - 30000338 - jz 0x0338
+  0324 - 03000000 - swap
+  0328 - 0A000001 - push 1
+  032c - 11000000 - add
+  0330 - 03000000 - swap
+  0334 - 31000314 - jmp 0x0314
+  0338 - 02000000 - drop
+  033c - 05000000 - ret
+  0340 - 01000000 - dup
+  0344 - 0A000000 - push 0
+  0348 - 1A000000 - lt
+  034c - 3000036C - jz 0x036c
+  0350 - 0A000000 - push 0
+  0354 - 03000000 - swap
+  0358 - 12000000 - sub
+  035c - 1000030C - call 0x030c ; digits
+  0360 - 0A000001 - push 1
+  0364 - 11000000 - add
+  0368 - 31000370 - jmp 0x0370
+  036c - 1000030C - call 0x030c ; digits
+  0370 - 05000000 - ret
+  0374 - 01000000 - dup
+  0378 - 0A000000 - push 0
+  037c - 1A000000 - lt
+  0380 - 300003C0 - jz 0x03c0
+  0384 - 0A00002D - push 45
+  0388 - 0A00FFF4 - push 65524
+  038c - 21000000 - store
+  0390 - 01000000 - dup
+  0394 - 0A000AC4 - push 2756
+  0398 - 20000000 - load
+  039c - 19000000 - eq
+  03a0 - 300003B4 - jz 0x03b4
+  03a4 - 02000000 - drop
+  03a8 - 0A000AC8 - push 2760
+  03ac - 1000018C - call 0x018c ; pstr-type
+  03b0 - 05000000 - ret
+  03b4 - 0A000000 - push 0
+  03b8 - 03000000 - swap
+  03bc - 12000000 - sub
+  03c0 - 1000013C - call 0x013c ; print-num
+  03c4 - 05000000 - ret
+  03c8 - 01000000 - dup
+  03cc - 10000340 - call 0x0340 ; int-len
+  03d0 - 0A000AAC - push 2732
+  03d4 - 20000000 - load
+  03d8 - 03000000 - swap
+  03dc - 12000000 - sub
+  03e0 - 0A000AA8 - push 2728
+  03e4 - 20000000 - load
+  03e8 - 0A000000 - push 0
+  03ec - 19000000 - eq
+  03f0 - 300003FC - jz 0x03fc
+  03f4 - 01000000 - dup
+  03f8 - 100002DC - call 0x02dc ; sp-n
+  03fc - 03000000 - swap
+  0400 - 10000374 - call 0x0374 ; print-int
+  0404 - 0A000AA8 - push 2728
+  0408 - 20000000 - load
+  040c - 30000418 - jz 0x0418
+  0410 - 100002DC - call 0x02dc ; sp-n
+  0414 - 3100041C - jmp 0x041c
+  0418 - 02000000 - drop
+  041c - 05000000 - ret
+  0420 - 0A000001 - push 1
+  0424 - 11000000 - add
+  0428 - 0A000000 - push 0
+  042c - 0A000AA8 - push 2728
+  0430 - 21000000 - store
+  0434 - 0A000000 - push 0
+  0438 - 0A000AAC - push 2732
+  043c - 21000000 - store
+  0440 - 01000000 - dup
+  0444 - 1000029C - call 0x029c ; fmt-at
+  0448 - 0A00002D - push 45
+  044c - 19000000 - eq
+  0450 - 30000468 - jz 0x0468
+  0454 - 0AFFFFFF - push -1
+  0458 - 0A000AA8 - push 2728
+  045c - 21000000 - store
+  0460 - 0A000001 - push 1
+  0464 - 11000000 - add
+  0468 - 01000000 - dup
+  046c - 1000029C - call 0x029c ; fmt-at
+  0470 - 10000004 - call 0x0004 ; digit?
+  0474 - 300004B0 - jz 0x04b0
+  0478 - 0A000AAC - push 2732
+  047c - 20000000 - load
+  0480 - 0A00000A - push 10
+  0484 - 13000000 - mul
+  0488 - 04000000 - over
+  048c - 1000029C - call 0x029c ; fmt-at
+  0490 - 0A000030 - push 48
+  0494 - 12000000 - sub
+  0498 - 11000000 - add
+  049c - 0A000AAC - push 2732
+  04a0 - 21000000 - store
+  04a4 - 0A000001 - push 1
+  04a8 - 11000000 - add
+  04ac - 31000468 - jmp 0x0468
+  04b0 - 01000000 - dup
+  04b4 - 1000029C - call 0x029c ; fmt-at
+  04b8 - 0A000064 - push 100
+  04bc - 19000000 - eq
+  04c0 - 300004DC - jz 0x04dc
+  04c4 - 0A000001 - push 1
+  04c8 - 11000000 - add
+  04cc - 0A000AB0 - push 2736
+  04d0 - 21000000 - store
+  04d4 - 0AFFFFFF - push -1
+  04d8 - 310004E4 - jmp 0x04e4
+  04dc - 02000000 - drop
+  04e0 - 0A000000 - push 0
+  04e4 - 05000000 - ret
+  04e8 - 0A000000 - push 0
+  04ec - 0A000AA0 - push 2720
+  04f0 - 21000000 - store
+  04f4 - 0A000000 - push 0
+  04f8 - 01000000 - dup
+  04fc - 1000028C - call 0x028c ; fmt-len
+  0500 - 1A000000 - lt
+  0504 - 30000568 - jz 0x0568
+  0508 - 01000000 - dup
+  050c - 1000029C - call 0x029c ; fmt-at
+  0510 - 0A000025 - push 37
+  0514 - 19000000 - eq
+  0518 - 3000055C - jz 0x055c
+  051c - 01000000 - dup
+  0520 - 10000420 - call 0x0420 ; parse-spec
+  0524 - 30000550 - jz 0x0550
+  0528 - 02000000 - drop
+  052c - 0A000AB0 - push 2736
+  0530 - 20000000 - load
+  0534 - 0A000AA0 - push 2720
+  0538 - 20000000 - load
+  053c - 0A000001 - push 1
+  0540 - 11000000 - add
+  0544 - 0A000AA0 - push 2720
+  0548 - 21000000 - store
+  054c - 31000558 - jmp 0x0558
+  0550 - 0A000001 - push 1
+  0554 - 11000000 - add
+  0558 - 31000564 - jmp 0x0564
+  055c - 0A000001 - push 1
+  0560 - 11000000 - add
+  0564 - 310004F8 - jmp 0x04f8
+  0568 - 02000000 - drop
+  056c - 05000000 - ret
+  0570 - 0A000000 - push 0
+  0574 - 0A00FFF0 - push 65520
+  0578 - 20000000 - load
+  057c - 01000000 - dup
+  0580 - 0A00000A - push 10
+  0584 - 19000000 - eq
+  0588 - 0AFFFFFF - push -1
+  058c - 18000000 - xor
+  0590 - 300005E4 - jz 0x05e4
+  0594 - 04000000 - over
+  0598 - 0A000020 - push 32
+  059c - 1A000000 - lt
+  05a0 - 300005D0 - jz 0x05d0
+  05a4 - 04000000 - over
+  05a8 - 0A000001 - push 1
+  05ac - 11000000 - add
+  05b0 - 0A000004 - push 4
+  05b4 - 13000000 - mul
+  05b8 - 0A0009B8 - push 2488
+  05bc - 11000000 - add
+  05c0 - 21000000 - store
+  05c4 - 0A000001 - push 1
+  05c8 - 11000000 - add
+  05cc - 310005E0 - jmp 0x05e0
+  05d0 - 02000000 - drop
+  05d4 - 0AFFFFFF - push -1
+  05d8 - 0A000A9C - push 2716
+  05dc - 21000000 - store
+  05e0 - 31000574 - jmp 0x0574
+  05e4 - 02000000 - drop
+  05e8 - 0A0009B8 - push 2488
+  05ec - 21000000 - store
+  05f0 - 05000000 - ret
+  05f4 - 0A000AF4 - push 2804
+  05f8 - 20000000 - load
+  05fc - 0A000AB4 - push 2740
+  0600 - 20000000 - load
+  0604 - 1C000000 - ult
+  0608 - 0A000AB4 - push 2740
+  060c - 20000000 - load
+  0610 - 0A000AF4 - push 2804
+  0614 - 20000000 - load
+  0618 - 19000000 - eq
+  061c - 0A000AC0 - push 2752
+  0620 - 20000000 - load
+  0624 - 0A000008 - push 8
+  0628 - 1B000000 - gt
+  062c - 16000000 - and
+  0630 - 17000000 - or
+  0634 - 05000000 - ret
+  0638 - 0A000000 - push 0
+  063c - 0A000AB4 - push 2740
+  0640 - 21000000 - store
+  0644 - 0A000001 - push 1
+  0648 - 0A000AB8 - push 2744
+  064c - 21000000 - store
+  0650 - 0A000000 - push 0
+  0654 - 0A000ABC - push 2748
+  0658 - 21000000 - store
+  065c - 0A00FFF0 - push 65520
+  0660 - 20000000 - load
+  0664 - 01000000 - dup
+  0668 - 0A00002D - push 45
+  066c - 19000000 - eq
+  0670 - 30000690 - jz 0x0690
+  0674 - 02000000 - drop
+  0678 - 0AFFFFFF - push -1
+  067c - 0A000AB8 - push 2744
+  0680 - 21000000 - store
+  0684 - 0A00FFF0 - push 65520
+  0688 - 20000000 - load
+  068c - 310006AC - jmp 0x06ac
+  0690 - 01000000 - dup
+  0694 - 0A00002B - push 43
+  0698 - 19000000 - eq
+  069c - 300006AC - jz 0x06ac
+  06a0 - 02000000 - drop
+  06a4 - 0A00FFF0 - push 65520
+  06a8 - 20000000 - load
+  06ac - 01000000 - dup
+  06b0 - 0A00000A - push 10
+  06b4 - 19000000 - eq
+  06b8 - 0AFFFFFF - push -1
+  06bc - 18000000 - xor
+  06c0 - 30000770 - jz 0x0770
+  06c4 - 0A000A9C - push 2716
+  06c8 - 20000000 - load
+  06cc - 0A000000 - push 0
+  06d0 - 19000000 - eq
+  06d4 - 30000760 - jz 0x0760
+  06d8 - 01000000 - dup
+  06dc - 10000004 - call 0x0004 ; digit?
+  06e0 - 3000074C - jz 0x074c
+  06e4 - 0A000030 - push 48
+  06e8 - 12000000 - sub
+  06ec - 0A000AC0 - push 2752
+  06f0 - 21000000 - store
+  06f4 - 100005F4 - call 0x05f4 ; overflow?
+  06f8 - 3000070C - jz 0x070c
+  06fc - 0AFFFFFF - push -1
+  0700 - 0A000A9C - push 2716
+  0704 - 21000000 - store
+  0708 - 31000730 - jmp 0x0730
+  070c - 0A000AB4 - push 2740
+  0710 - 20000000 - load
+  0714 - 0A00000A - push 10
+  0718 - 13000000 - mul
+  071c - 0A000AC0 - push 2752
+  0720 - 20000000 - load
+  0724 - 11000000 - add
+  0728 - 0A000AB4 - push 2740
+  072c - 21000000 - store
+  0730 - 0A000ABC - push 2748
+  0734 - 20000000 - load
+  0738 - 0A000001 - push 1
+  073c - 11000000 - add
+  0740 - 0A000ABC - push 2748
+  0744 - 21000000 - store
+  0748 - 3100075C - jmp 0x075c
+  074c - 02000000 - drop
+  0750 - 0AFFFFFF - push -1
+  0754 - 0A000A9C - push 2716
+  0758 - 21000000 - store
+  075c - 31000764 - jmp 0x0764
+  0760 - 02000000 - drop
+  0764 - 0A00FFF0 - push 65520
+  0768 - 20000000 - load
+  076c - 310006AC - jmp 0x06ac
+  0770 - 02000000 - drop
+  0774 - 0A000ABC - push 2748
+  0778 - 20000000 - load
+  077c - 0A000000 - push 0
+  0780 - 19000000 - eq
+  0784 - 30000794 - jz 0x0794
+  0788 - 0AFFFFFF - push -1
+  078c - 0A000A9C - push 2716
+  0790 - 21000000 - store
+  0794 - 0A000AB8 - push 2744
+  0798 - 20000000 - load
+  079c - 0A000001 - push 1
+  07a0 - 19000000 - eq
+  07a4 - 0A000AF8 - push 2808
+  07a8 - 20000000 - load
+  07ac - 0A000AB4 - push 2740
+  07b0 - 20000000 - load
+  07b4 - 1C000000 - ult
+  07b8 - 16000000 - and
+  07bc - 300007CC - jz 0x07cc
+  07c0 - 0AFFFFFF - push -1
+  07c4 - 0A000A9C - push 2716
+  07c8 - 21000000 - store
+  07cc - 0A000AB4 - push 2740
+  07d0 - 20000000 - load
+  07d4 - 0A000AB8 - push 2744
+  07d8 - 20000000 - load
+  07dc - 13000000 - mul
+  07e0 - 05000000 - ret
+  07e4 - 0A000AA0 - push 2720
+  07e8 - 20000000 - load
+  07ec - 0A000000 - push 0
+  07f0 - 04000000 - over
+  07f4 - 04000000 - over
+  07f8 - 19000000 - eq
+  07fc - 3000080C - jz 0x080c
+  0800 - 02000000 - drop
+  0804 - 02000000 - drop
+  0808 - 31000864 - jmp 0x0864
+  080c - 03000000 - swap
+  0810 - 06000000 - tor
+  0814 - 06000000 - tor
+  0818 - 10000638 - call 0x0638 ; read-int-line
+  081c - 08000000 - rfetch
+  0820 - 0A000004 - push 4
+  0824 - 13000000 - mul
+  0828 - 0A000A58 - push 2648
+  082c - 11000000 - add
+  0830 - 21000000 - store
+  0834 - 07000000 - fromr
+  0838 - 0A000001 - push 1
+  083c - 11000000 - add
+  0840 - 08000000 - rfetch
+  0844 - 04000000 - over
+  0848 - 19000000 - eq
+  084c - 32000858 - jnz 0x0858
+  0850 - 06000000 - tor
+  0854 - 31000818 - jmp 0x0818
+  0858 - 02000000 - drop
+  085c - 07000000 - fromr
+  0860 - 02000000 - drop
+  0864 - 05000000 - ret
+  0868 - 0A000000 - push 0
+  086c - 0A000AA4 - push 2724
+  0870 - 21000000 - store
+  0874 - 0A000000 - push 0
+  0878 - 01000000 - dup
+  087c - 1000028C - call 0x028c ; fmt-len
+  0880 - 1A000000 - lt
+  0884 - 30000924 - jz 0x0924
+  0888 - 01000000 - dup
+  088c - 1000029C - call 0x029c ; fmt-at
+  0890 - 0A000025 - push 37
+  0894 - 19000000 - eq
+  0898 - 30000908 - jz 0x0908
+  089c - 01000000 - dup
+  08a0 - 10000420 - call 0x0420 ; parse-spec
+  08a4 - 300008F0 - jz 0x08f0
+  08a8 - 02000000 - drop
+  08ac - 0A000AB0 - push 2736
+  08b0 - 20000000 - load
+  08b4 - 0A000AA4 - push 2724
+  08b8 - 20000000 - load
+  08bc - 0A000004 - push 4
+  08c0 - 13000000 - mul
+  08c4 - 0A000A58 - push 2648
+  08c8 - 11000000 - add
+  08cc - 20000000 - load
+  08d0 - 100003C8 - call 0x03c8 ; print-padded
+  08d4 - 0A000AA4 - push 2724
+  08d8 - 20000000 - load
+  08dc - 0A000001 - push 1
+  08e0 - 11000000 - add
+  08e4 - 0A000AA4 - push 2724
+  08e8 - 21000000 - store
+  08ec - 31000904 - jmp 0x0904
+  08f0 - 0A000025 - push 37
+  08f4 - 0A00FFF4 - push 65524
+  08f8 - 21000000 - store
+  08fc - 0A000001 - push 1
+  0900 - 11000000 - add
+  0904 - 31000920 - jmp 0x0920
+  0908 - 01000000 - dup
+  090c - 1000029C - call 0x029c ; fmt-at
+  0910 - 0A00FFF4 - push 65524
+  0914 - 21000000 - store
+  0918 - 0A000001 - push 1
+  091c - 11000000 - add
+  0920 - 31000878 - jmp 0x0878
+  0924 - 02000000 - drop
+  0928 - 05000000 - ret
+  092c - 0A000000 - push 0
+  0930 - 0A000A9C - push 2716
+  0934 - 21000000 - store
+  0938 - 0A0009B8 - push 2488
+  093c - 0A000A98 - push 2712
+  0940 - 21000000 - store
+  0944 - 10000570 - call 0x0570 ; read-fmt
+  0948 - 0A000A9C - push 2716
+  094c - 20000000 - load
+  0950 - 3000096C - jz 0x096c
+  0954 - 0A000AFC - push 2812
+  0958 - 1000018C - call 0x018c ; pstr-type
+  095c - 0A00000A - push 10
+  0960 - 0A00FFF4 - push 65524
+  0964 - 21000000 - store
+  0968 - 05000000 - ret
+  096c - 100004E8 - call 0x04e8 ; count-specs
+  0970 - 100007E4 - call 0x07e4 ; read-vals
+  0974 - 0A000A9C - push 2716
+  0978 - 20000000 - load
+  097c - 30000998 - jz 0x0998
+  0980 - 0A000AFC - push 2812
+  0984 - 1000018C - call 0x018c ; pstr-type
+  0988 - 0A00000A - push 10
+  098c - 0A00FFF4 - push 65524
+  0990 - 21000000 - store
+  0994 - 05000000 - ret
+  0998 - 10000868 - call 0x0868 ; print-formatted
+  099c - 0A00000A - push 10
+  09a0 - 0A00FFF4 - push 65524
+  09a4 - 21000000 - store
+  09a8 - 05000000 - ret
+  09ac - 1000092C - call 0x092c ; main
+  09b0 - 00000000 - halt
+  09b4 - 00000000 - .word 0 ; variable neg
+  09b8 - 00000000 - .word 0 ; allot
+  09bc - 00000000 - .word 0 ; allot
+  09c0 - 00000000 - .word 0 ; allot
+  09c4 - 00000000 - .word 0 ; allot
+  09c8 - 00000000 - .word 0 ; allot
+  09cc - 00000000 - .word 0 ; allot
+  09d0 - 00000000 - .word 0 ; allot
+  09d4 - 00000000 - .word 0 ; allot
+  09d8 - 00000000 - .word 0 ; allot
+  09dc - 00000000 - .word 0 ; allot
+  09e0 - 00000000 - .word 0 ; allot
+  09e4 - 00000000 - .word 0 ; allot
+  09e8 - 00000000 - .word 0 ; allot
+  09ec - 00000000 - .word 0 ; allot
+  09f0 - 00000000 - .word 0 ; allot
+  09f4 - 00000000 - .word 0 ; allot
+  09f8 - 00000000 - .word 0 ; allot
+  09fc - 00000000 - .word 0 ; allot
+  0a00 - 00000000 - .word 0 ; allot
+  0a04 - 00000000 - .word 0 ; allot
+  0a08 - 00000000 - .word 0 ; allot
+  0a0c - 00000000 - .word 0 ; allot
+  0a10 - 00000000 - .word 0 ; allot
+  0a14 - 00000000 - .word 0 ; allot
+  0a18 - 00000000 - .word 0 ; allot
+  0a1c - 00000000 - .word 0 ; allot
+  0a20 - 00000000 - .word 0 ; allot
+  0a24 - 00000000 - .word 0 ; allot
+  0a28 - 00000000 - .word 0 ; allot
+  0a2c - 00000000 - .word 0 ; allot
+  0a30 - 00000000 - .word 0 ; allot
+  0a34 - 00000000 - .word 0 ; allot
+  0a38 - 00000000 - .word 0 ; allot
+  0a3c - 00000000 - .word 0 ; allot
+  0a40 - 00000000 - .word 0 ; allot
+  0a44 - 00000000 - .word 0 ; allot
+  0a48 - 00000000 - .word 0 ; allot
+  0a4c - 00000000 - .word 0 ; allot
+  0a50 - 00000000 - .word 0 ; allot
+  0a54 - 00000000 - .word 0 ; allot
+  0a58 - 00000000 - .word 0 ; allot
+  0a5c - 00000000 - .word 0 ; allot
+  0a60 - 00000000 - .word 0 ; allot
+  0a64 - 00000000 - .word 0 ; allot
+  0a68 - 00000000 - .word 0 ; allot
+  0a6c - 00000000 - .word 0 ; allot
+  0a70 - 00000000 - .word 0 ; allot
+  0a74 - 00000000 - .word 0 ; allot
+  0a78 - 00000000 - .word 0 ; allot
+  0a7c - 00000000 - .word 0 ; allot
+  0a80 - 00000000 - .word 0 ; allot
+  0a84 - 00000000 - .word 0 ; allot
+  0a88 - 00000000 - .word 0 ; allot
+  0a8c - 00000000 - .word 0 ; allot
+  0a90 - 00000000 - .word 0 ; allot
+  0a94 - 00000000 - .word 0 ; allot
+  0a98 - 00000000 - .word 0 ; variable fmt
+  0a9c - 00000000 - .word 0 ; variable bad
+  0aa0 - 00000000 - .word 0 ; variable cnt
+  0aa4 - 00000000 - .word 0 ; variable vi
+  0aa8 - 00000000 - .word 0 ; variable left
+  0aac - 00000000 - .word 0 ; variable width
+  0ab0 - 00000000 - .word 0 ; variable spec-end
+  0ab4 - 00000000 - .word 0 ; variable acc
+  0ab8 - 00000000 - .word 0 ; variable sgn
+  0abc - 00000000 - .word 0 ; variable nd
+  0ac0 - 00000000 - .word 0 ; variable dgt
+  0ac4 - -80000000 - .word -2147483648 ; literal -2147483648
+  0ac8 - 0000000A - .word 10 ; length of '2147483648'
+  0acc - 00000032 - .word 50 ; '2'
+  0ad0 - 00000031 - .word 49 ; '1'
+  0ad4 - 00000034 - .word 52 ; '4'
+  0ad8 - 00000037 - .word 55 ; '7'
+  0adc - 00000034 - .word 52 ; '4'
+  0ae0 - 00000038 - .word 56 ; '8'
+  0ae4 - 00000033 - .word 51 ; '3'
+  0ae8 - 00000036 - .word 54 ; '6'
+  0aec - 00000034 - .word 52 ; '4'
+  0af0 - 00000038 - .word 56 ; '8'
+  0af4 - 0CCCCCCC - .word 214748364 ; literal 214748364
+  0af8 - 7FFFFFFF - .word 2147483647 ; literal 2147483647
+  0afc - 00000002 - .word 2 ; length of '-1'
+  0b00 - 0000002D - .word 45 ; '-'
+  0b04 - 00000031 - .word 49 ; '1'
+out_stdout: |
+  -1
+out_ticks: 12120
+out_ticks_no_cache: 11448
+out_cache_hits: 482
+out_cache_misses: 167
+out_log: |
+  TICK:      1 MPC:   0 fetch0     EXEC PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  CACHE read miss addr=0x0000: filling the line
+  TICK:      2 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:      3 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:      4 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:      5 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:      6 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:      7 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:      8 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:      9 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     10 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  CACHE fill word 0 addr=0x0000
+  TICK:     11 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     12 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     13 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     14 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     15 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     16 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     17 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     18 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     19 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     20 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  CACHE fill word 1 addr=0x0004
+  TICK:     21 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     22 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     23 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     24 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     25 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     26 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     27 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     28 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     29 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     30 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  CACHE fill word 2 addr=0x0008
+  TICK:     31 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     32 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     33 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     34 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     35 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     36 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     37 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     38 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     39 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     40 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  CACHE fill word 3 addr=0x000c
+  TICK:     41 MPC:   1 fetch1     EXEC PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     42 MPC:   2 fetch2     EXEC PC:0x0004 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:822086060 IR:0x00000000 NZVC:0000
+  TICK:     43 MPC:   3 fetch3     EXEC PC:0x0004 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:822086060 IR:0x310009ac NZVC:0000
+  TICK:     44 MPC:  96 jmp0       EXEC PC:0x0004 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:822086060 IR:0x310009ac NZVC:0000
+  TICK:     45 MPC:   0 fetch0     EXEC PC:0x09ac SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:822086060 IR:0x310009ac NZVC:0000
+  CACHE read miss addr=0x09ac: filling the line
+  TICK:     46 MPC:   1 fetch1     WAIT PC:0x09ac SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x09ac DR:822086060 IR:0x310009ac NZVC:0000
+  TICK:     47 MPC:   1 fetch1     WAIT PC:0x09ac SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x09ac DR:822086060 IR:0x310009ac NZVC:0000
+  TICK:     48 MPC:   1 fetch1     WAIT PC:0x09ac SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x09ac DR:822086060 IR:0x310009ac NZVC:0000
+  TICK:     49 MPC:   1 fetch1     WAIT PC:0x09ac SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x09ac DR:822086060 IR:0x310009ac NZVC:0000
+  TICK:     50 MPC:   1 fetch1     WAIT PC:0x09ac SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x09ac DR:822086060 IR:0x310009ac NZVC:0000
+  TICK:     51 MPC:   1 fetch1     WAIT PC:0x09ac SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x09ac DR:822086060 IR:0x310009ac NZVC:0000
+  TICK:     52 MPC:   1 fetch1     WAIT PC:0x09ac SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x09ac DR:822086060 IR:0x310009ac NZVC:0000
+  TICK:     53 MPC:   1 fetch1     WAIT PC:0x09ac SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x09ac DR:822086060 IR:0x310009ac NZVC:0000
+  TICK:     54 MPC:   1 fetch1     WAIT PC:0x09ac SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x09ac DR:822086060 IR:0x310009ac NZVC:0000
+  ... 13575 lines skipped ...
+  TICK:  12112 MPC:   1 fetch1     WAIT PC:0x09b0 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x09b0 DR:0 IR:0x05000000 NZVC:1000
+  TICK:  12113 MPC:   1 fetch1     WAIT PC:0x09b0 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x09b0 DR:0 IR:0x05000000 NZVC:1000
+  TICK:  12114 MPC:   1 fetch1     WAIT PC:0x09b0 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x09b0 DR:0 IR:0x05000000 NZVC:1000
+  TICK:  12115 MPC:   1 fetch1     WAIT PC:0x09b0 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x09b0 DR:0 IR:0x05000000 NZVC:1000
+  TICK:  12116 MPC:   1 fetch1     WAIT PC:0x09b0 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x09b0 DR:0 IR:0x05000000 NZVC:1000
+  CACHE fill word 3 addr=0x09bc
+  TICK:  12117 MPC:   1 fetch1     EXEC PC:0x09b0 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x09b0 DR:0 IR:0x05000000 NZVC:1000
+  TICK:  12118 MPC:   2 fetch2     EXEC PC:0x09b4 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x09b0 DR:0 IR:0x05000000 NZVC:1000
+  TICK:  12119 MPC:   3 fetch3     EXEC PC:0x09b4 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x09b0 DR:0 IR:0x00000000 NZVC:1000
+  TICK:  12120 MPC:   4 halt0      EXEC PC:0x09b4 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x09b0 DR:0 IR:0x00000000 NZVC:1000

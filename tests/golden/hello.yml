@@ -1,0 +1,273 @@
+in_source: |
+  include lib.fs
+
+  : main ." Hello, World!" cr ;
+
+  main
+  bye
+in_stdin: ''
+out_code: |
+  0000 - 310002A4 - jmp 0x02a4 ; entry
+  0004 - 0A000030 - push 48
+  0008 - 12000000 - sub
+  000c - 0A00000A - push 10
+  0010 - 1C000000 - ult
+  0014 - 05000000 - ret
+  0018 - 0A00FFF0 - push 65520
+  001c - 20000000 - load
+  0020 - 01000000 - dup
+  0024 - 10000004 - call 0x0004 ; digit?
+  0028 - 0A000000 - push 0
+  002c - 19000000 - eq
+  0030 - 3000003C - jz 0x003c
+  0034 - 02000000 - drop
+  0038 - 31000018 - jmp 0x0018
+  003c - 0A000030 - push 48
+  0040 - 12000000 - sub
+  0044 - 0A00FFF0 - push 65520
+  0048 - 20000000 - load
+  004c - 01000000 - dup
+  0050 - 10000004 - call 0x0004 ; digit?
+  0054 - 30000074 - jz 0x0074
+  0058 - 0A000030 - push 48
+  005c - 12000000 - sub
+  0060 - 03000000 - swap
+  0064 - 0A00000A - push 10
+  0068 - 13000000 - mul
+  006c - 11000000 - add
+  0070 - 31000044 - jmp 0x0044
+  0074 - 02000000 - drop
+  0078 - 05000000 - ret
+  007c - 0A000000 - push 0
+  0080 - 0A0002AC - push 684
+  0084 - 21000000 - store
+  0088 - 0A00FFF0 - push 65520
+  008c - 20000000 - load
+  0090 - 01000000 - dup
+  0094 - 10000004 - call 0x0004 ; digit?
+  0098 - 04000000 - over
+  009c - 0A00002D - push 45
+  00a0 - 19000000 - eq
+  00a4 - 17000000 - or
+  00a8 - 0A000000 - push 0
+  00ac - 19000000 - eq
+  00b0 - 300000BC - jz 0x00bc
+  00b4 - 02000000 - drop
+  00b8 - 31000088 - jmp 0x0088
+  00bc - 01000000 - dup
+  00c0 - 0A00002D - push 45
+  00c4 - 19000000 - eq
+  00c8 - 300000E4 - jz 0x00e4
+  00cc - 0AFFFFFF - push -1
+  00d0 - 0A0002AC - push 684
+  00d4 - 21000000 - store
+  00d8 - 02000000 - drop
+  00dc - 0A00FFF0 - push 65520
+  00e0 - 20000000 - load
+  00e4 - 0A000030 - push 48
+  00e8 - 12000000 - sub
+  00ec - 0A00FFF0 - push 65520
+  00f0 - 20000000 - load
+  00f4 - 01000000 - dup
+  00f8 - 10000004 - call 0x0004 ; digit?
+  00fc - 3000011C - jz 0x011c
+  0100 - 0A000030 - push 48
+  0104 - 12000000 - sub
+  0108 - 03000000 - swap
+  010c - 0A00000A - push 10
+  0110 - 13000000 - mul
+  0114 - 11000000 - add
+  0118 - 310000EC - jmp 0x00ec
+  011c - 02000000 - drop
+  0120 - 0A0002AC - push 684
+  0124 - 20000000 - load
+  0128 - 30000138 - jz 0x0138
+  012c - 0A000000 - push 0
+  0130 - 03000000 - swap
+  0134 - 12000000 - sub
+  0138 - 05000000 - ret
+  013c - 01000000 - dup
+  0140 - 0A00000A - push 10
+  0144 - 1C000000 - ult
+  0148 - 30000160 - jz 0x0160
+  014c - 0A000030 - push 48
+  0150 - 11000000 - add
+  0154 - 0A00FFF4 - push 65524
+  0158 - 21000000 - store
+  015c - 05000000 - ret
+  0160 - 01000000 - dup
+  0164 - 0A00000A - push 10
+  0168 - 14000000 - div
+  016c - 1000013C - call 0x013c ; print-num
+  0170 - 0A00000A - push 10
+  0174 - 15000000 - mod
+  0178 - 0A000030 - push 48
+  017c - 11000000 - add
+  0180 - 0A00FFF4 - push 65524
+  0184 - 21000000 - store
+  0188 - 05000000 - ret
+  018c - 01000000 - dup
+  0190 - 20000000 - load
+  0194 - 0A000000 - push 0
+  0198 - 04000000 - over
+  019c - 04000000 - over
+  01a0 - 19000000 - eq
+  01a4 - 300001B4 - jz 0x01b4
+  01a8 - 02000000 - drop
+  01ac - 02000000 - drop
+  01b0 - 31000218 - jmp 0x0218
+  01b4 - 03000000 - swap
+  01b8 - 06000000 - tor
+  01bc - 06000000 - tor
+  01c0 - 01000000 - dup
+  01c4 - 08000000 - rfetch
+  01c8 - 0A000001 - push 1
+  01cc - 11000000 - add
+  01d0 - 0A000004 - push 4
+  01d4 - 13000000 - mul
+  01d8 - 11000000 - add
+  01dc - 20000000 - load
+  01e0 - 0A00FFF4 - push 65524
+  01e4 - 21000000 - store
+  01e8 - 07000000 - fromr
+  01ec - 0A000001 - push 1
+  01f0 - 11000000 - add
+  01f4 - 08000000 - rfetch
+  01f8 - 04000000 - over
+  01fc - 19000000 - eq
+  0200 - 3200020C - jnz 0x020c
+  0204 - 06000000 - tor
+  0208 - 310001C0 - jmp 0x01c0
+  020c - 02000000 - drop
+  0210 - 07000000 - fromr
+  0214 - 02000000 - drop
+  0218 - 02000000 - drop
+  021c - 05000000 - ret
+  0220 - 0A000000 - push 0
+  0224 - 0A00FFF0 - push 65520
+  0228 - 20000000 - load
+  022c - 01000000 - dup
+  0230 - 0A00000A - push 10
+  0234 - 19000000 - eq
+  0238 - 0A000000 - push 0
+  023c - 19000000 - eq
+  0240 - 3000027C - jz 0x027c
+  0244 - 06000000 - tor
+  0248 - 04000000 - over
+  024c - 04000000 - over
+  0250 - 0A000001 - push 1
+  0254 - 11000000 - add
+  0258 - 0A000004 - push 4
+  025c - 13000000 - mul
+  0260 - 11000000 - add
+  0264 - 07000000 - fromr
+  0268 - 03000000 - swap
+  026c - 21000000 - store
+  0270 - 0A000001 - push 1
+  0274 - 11000000 - add
+  0278 - 31000224 - jmp 0x0224
+  027c - 02000000 - drop
+  0280 - 03000000 - swap
+  0284 - 21000000 - store
+  0288 - 05000000 - ret
+  028c - 0A0002B0 - push 688
+  0290 - 1000018C - call 0x018c ; pstr-type
+  0294 - 0A00000A - push 10
+  0298 - 0A00FFF4 - push 65524
+  029c - 21000000 - store
+  02a0 - 05000000 - ret
+  02a4 - 1000028C - call 0x028c ; main
+  02a8 - 00000000 - halt
+  02ac - 00000000 - .word 0 ; variable neg
+  02b0 - 0000000D - .word 13 ; length of 'Hello, World!'
+  02b4 - 00000048 - .word 72 ; 'H'
+  02b8 - 00000065 - .word 101 ; 'e'
+  02bc - 0000006C - .word 108 ; 'l'
+  02c0 - 0000006C - .word 108 ; 'l'
+  02c4 - 0000006F - .word 111 ; 'o'
+  02c8 - 0000002C - .word 44 ; ','
+  02cc - 00000020 - .word 32 ; ' '
+  02d0 - 00000057 - .word 87 ; 'W'
+  02d4 - 0000006F - .word 111 ; 'o'
+  02d8 - 00000072 - .word 114 ; 'r'
+  02dc - 0000006C - .word 108 ; 'l'
+  02e0 - 00000064 - .word 100 ; 'd'
+  02e4 - 00000021 - .word 33 ; '!'
+out_stdout: |
+  Hello, World!
+out_ticks: 5706
+out_ticks_no_cache: 7533
+out_cache_hits: 373
+out_cache_misses: 51
+out_log: |
+  TICK:      1 MPC:   0 fetch0     EXEC PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  CACHE read miss addr=0x0000: filling the line
+  TICK:      2 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:      3 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:      4 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:      5 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:      6 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:      7 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:      8 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:      9 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     10 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  CACHE fill word 0 addr=0x0000
+  TICK:     11 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     12 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     13 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     14 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     15 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     16 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     17 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     18 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     19 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     20 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  CACHE fill word 1 addr=0x0004
+  TICK:     21 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     22 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     23 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     24 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     25 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     26 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     27 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     28 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     29 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     30 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  CACHE fill word 2 addr=0x0008
+  TICK:     31 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     32 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     33 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     34 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     35 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     36 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     37 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     38 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     39 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     40 MPC:   1 fetch1     WAIT PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  CACHE fill word 3 addr=0x000c
+  TICK:     41 MPC:   1 fetch1     EXEC PC:0x0000 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:0 IR:0x00000000 NZVC:0000
+  TICK:     42 MPC:   2 fetch2     EXEC PC:0x0004 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:822084260 IR:0x00000000 NZVC:0000
+  TICK:     43 MPC:   3 fetch3     EXEC PC:0x0004 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:822084260 IR:0x310002a4 NZVC:0000
+  TICK:     44 MPC:  96 jmp0       EXEC PC:0x0004 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:822084260 IR:0x310002a4 NZVC:0000
+  TICK:     45 MPC:   0 fetch0     EXEC PC:0x02a4 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x0000 DR:822084260 IR:0x310002a4 NZVC:0000
+  CACHE read miss addr=0x02a4: filling the line
+  TICK:     46 MPC:   1 fetch1     WAIT PC:0x02a4 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x02a4 DR:822084260 IR:0x310002a4 NZVC:0000
+  TICK:     47 MPC:   1 fetch1     WAIT PC:0x02a4 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x02a4 DR:822084260 IR:0x310002a4 NZVC:0000
+  TICK:     48 MPC:   1 fetch1     WAIT PC:0x02a4 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x02a4 DR:822084260 IR:0x310002a4 NZVC:0000
+  TICK:     49 MPC:   1 fetch1     WAIT PC:0x02a4 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x02a4 DR:822084260 IR:0x310002a4 NZVC:0000
+  TICK:     50 MPC:   1 fetch1     WAIT PC:0x02a4 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x02a4 DR:822084260 IR:0x310002a4 NZVC:0000
+  TICK:     51 MPC:   1 fetch1     WAIT PC:0x02a4 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x02a4 DR:822084260 IR:0x310002a4 NZVC:0000
+  TICK:     52 MPC:   1 fetch1     WAIT PC:0x02a4 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x02a4 DR:822084260 IR:0x310002a4 NZVC:0000
+  TICK:     53 MPC:   1 fetch1     WAIT PC:0x02a4 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x02a4 DR:822084260 IR:0x310002a4 NZVC:0000
+  TICK:     54 MPC:   1 fetch1     WAIT PC:0x02a4 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x02a4 DR:822084260 IR:0x310002a4 NZVC:0000
+  ... 6405 lines skipped ...
+  TICK:   5699 MPC:  77 ret2       WAIT PC:0x02a8 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x2a8 AR:0xfbfc DR:83886080 IR:0x05000000 NZVC:1000
+  CACHE fill word 3 addr=0xfbfc
+  TICK:   5700 MPC:  77 ret2       EXEC PC:0x02a8 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x2a8 AR:0xfbfc DR:83886080 IR:0x05000000 NZVC:1000
+  TICK:   5701 MPC:  78 ret3       EXEC PC:0x02a8 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x2a8 AR:0xfbfc DR:0 IR:0x05000000 NZVC:1000
+  TICK:   5702 MPC:   0 fetch0     EXEC PC:0x02a8 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0xfbfc DR:0 IR:0x05000000 NZVC:1000
+  CACHE read hit  addr=0x02a8
+  TICK:   5703 MPC:   1 fetch1     EXEC PC:0x02a8 SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x02a8 DR:0 IR:0x05000000 NZVC:1000
+  TICK:   5704 MPC:   2 fetch2     EXEC PC:0x02ac SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x02a8 DR:0 IR:0x05000000 NZVC:1000
+  TICK:   5705 MPC:   3 fetch3     EXEC PC:0x02ac SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x02a8 DR:0 IR:0x00000000 NZVC:1000
+  TICK:   5706 MPC:   4 halt0      EXEC PC:0x02ac SP:0xf7fc RSP:0xfbfc T:0 S:0 R:0x0 AR:0x02a8 DR:0 IR:0x00000000 NZVC:1000
