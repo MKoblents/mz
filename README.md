@@ -492,9 +492,9 @@ bye
 
 ### DataPath
 
-Схема DataPath и кеша:
+Схема DataPath:
 
-![DataPath и кеш](docs/scheme-Page-1.drawio.svg)
+![DataPath](docs/scheme-Page-1.drawio.svg)
 
 Реализован классом `DataPath` (`components/data_path.py`).
 
@@ -543,6 +543,9 @@ bye
 **Защёлки.** `latch_s`, `latch_pc`, `latch_sp`, `latch_rsp`, `latch_r`, `latch_t`, `latch_ar`, `latch_ir`, `latch_sr` записывают в регистр значение с шины. У `DR` два источника: `latch_dr_alu` берёт значение с шины, `latch_dr_mem` берёт данные из памяти.
 
 Все регистры 32-битные, кроме `SR` (4 бита).
+
+### Схема памяти с кэшем
+![Память и кэщ](docs/scheme-Page-3.drawio.svg)
 
 ### Control Unit и микрокод
 
